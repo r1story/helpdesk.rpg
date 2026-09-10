@@ -19,7 +19,7 @@ def afficher_tableau_de_bord(joueur: Player) -> None:
     print("=" * 60)
     print(f" TECH: {joueur.nom.upper()} | RÔLE: {joueur.archetype.upper()} | SEMAINE: {joueur.semaine_actuelle}/52")
     print("-" * 60)
-    print(f" Énergie      : {barre(joueur.energie, joueur.energie_max, 10)}")
+    print(f" Énergie ⚡   : {barre(joueur.energie, joueur.energie_max, 10)}")
     print(f" Moral        : {barre(joueur.moral)}")
     print(f" Technique    : {barre(joueur.technique)}")
     print(f" Relationnel  : {barre(joueur.relationnel)}")

@@ -22,3 +22,22 @@ Bloc-notes : le cahier des charges
 
     * Un système d'alliance pour représenter une vraie rivalité ou entraide en entreprise
 
+
+
+## === Améliorations à prévoir ===
+
+- Que faire si le joueur est bloqué ? (Option bonus indispensable) <br>
+Avec ce système, imagine qu'il te reste 1 point d'énergie, mais que toutes les options d'un ticket demandent 2 ou 3 points. Tu te retrouverais coincé dans une boucle infinie.
+<br>
+Pour éviter ça, tu peux ajouter un moyen explicite de clore sa semaine quand on n'a plus assez de jus pour traiter les tickets lourds.
+<br>
+Dans src/ui.py, dans demander_choix, ou directement dans main.py, tu peux autoriser une saisie spéciale comme 0 pour dire : "Je n'ai plus la force, je quitte le bureau pour cette semaine".
+<br>
+Par exemple, dans afficher_evenement(event) :
+<br>
+````python
+    print(f"  [0] Finir sa semaine plus tôt (conserve l'énergie restante)")
+````
+<br>
+Et dans la gestion du choix : si l'utilisateur tape 0, on fait break pour passer directement à la semaine suivante.
+

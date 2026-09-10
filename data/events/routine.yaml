@@ -65,3 +65,208 @@
       impacts:
         moral: 0
         technique: -5
+
+- id: onboarding_nouvel_arrivant
+  type: routine
+  titre: "RH : Onboarding de dernière minute"
+  description: "Les RH t'informent qu'un nouveau cadre arrive dans 15 minutes. Aucun compte AD n'est créé et aucun PC n'est préparé."
+  cooldown: 3
+  choix:
+    - texte: "Cloner un master en urgence et créer le compte sans les groupes sensibles"
+      cout_energie: 3
+      impacts:
+        moral: -5
+        technique: 5
+        relationnel: 10
+        promotion: 10
+
+    - texte: "Rappeler calmement aux RH le SLA de 72h et refuser l'urgence"
+      cout_energie: 1
+      impacts:
+        moral: 10
+        relationnel: -20
+        promotion: -10
+      flags_ajoutes: ["ennemi_rh"]
+
+- id: mot_de_passe_lundi
+  type: routine
+  titre: "Routine : L'amnésie du lundi matin"
+  description: "Trois utilisateurs d'un coup ont oublié leur mot de passe après le week-end et bloquent leur session Windows."
+  cooldown: 1
+  choix:
+    - texte: "Faire les 3 resets à la chaîne sur l'Active Directory"
+      cout_energie: 1
+      impacts:
+        moral: -5
+        relationnel: 5
+
+    - texte: "Prendre 10 minutes pour leur réexpliquer le portail de self-reset"
+      cout_energie: 2
+      impacts:
+        moral: 0
+        technique: 5
+        relationnel: 10
+
+- id: nettoyage_backlog_tickets
+  type: routine
+  titre: "Gestion : Nettoyage du cimetière de tickets"
+  description: "Le backlog affiche 120 tickets ouverts depuis plus de 6 mois sans réponse des utilisateurs."
+  cooldown: 6
+  choix:
+    - texte: "Fermeture massive avec message automatique 'Sans nouvelle sous 48h, ticket clos'"
+      cout_energie: 2
+      impacts:
+        moral: 15
+        relationnel: -10
+        promotion: 10
+      flags_ajoutes: ["tueur_de_tickets"]
+
+    - texte: "Relancer chaque utilisateur individuellement par téléphone"
+      cout_energie: 5
+      impacts:
+        moral: -20
+        relationnel: 15
+        promotion: 5
+
+- id: phishing_suspicion
+  type: routine
+  titre: "Sécurité : Signalement de mail douteux"
+  description: "Un comptable a cliqué sur un lien 'Facture urgente Chronopost' et a entré ses identifiants Microsoft 365."
+  cooldown: 4
+  choix:
+    - texte: "Isoler la machine du réseau, révoquer les sessions Azure et analyser les logs"
+      cout_energie: 4
+      impacts:
+        moral: -5
+        technique: 20
+        promotion: 15
+      flags_ajoutes: ["reflexe_cyber"]
+
+    - texte: "Changer juste le mot de passe et lui dire de faire attention"
+      cout_energie: 1
+      impacts:
+        moral: 0
+        technique: -5
+        promotion: -5
+
+- id: demande_shadow_it
+  type: routine
+  titre: "Shadow IT : Le service Marketing veut ses droits Admin"
+  description: "Le responsable com' veut installer un logiciel de montage vidéo non homologué et exige les droits administrateur local."
+  cooldown: 4
+  choix:
+    - texte: "Refuser net en citant la PSSI de l'entreprise"
+      cout_energie: 1
+      impacts:
+        moral: 5
+        relationnel: -15
+        promotion: 5
+
+    - texte: "Chercher et déployer une alternative open-source propre via le gestionnaire de paquets"
+      cout_energie: 3
+      impacts:
+        moral: 5
+        technique: 15
+        relationnel: 15
+        promotion: 10
+
+- id: cable_management_baie
+  type: routine
+  titre: "Propreté : La baie de brassage ressemble à un plat de spaghettis"
+  description: "Des jarretières de 5 mètres pendent n'importe comment dans le local technique. Un faux mouvement peut faire sauter un switch."
+  cooldown: 8
+  choix:
+    - texte: "Passer la demi-journée à repérer les ports et tout rebrasser proprement"
+      cout_energie: 4
+      impacts:
+        moral: 10
+        technique: 10
+        relationnel: 5
+        promotion: 5
+      flags_ajoutes: ["baie_propre"]
+
+    - texte: "Refermer la porte à clé et faire semblant de n'avoir rien vu"
+      cout_energie: 0
+      impacts:
+        moral: -5
+
+- id: utilisateur_vip_caprice
+  type: routine
+  titre: "VIP : Le Directeur Financier veut un double écran 4K"
+  description: "Le DAF exige du matériel ultra haut de gamme non standard sans passer par la validation des devis."
+  cooldown: 5
+  choix:
+    - texte: "Passer la commande en douce pour avoir la paix"
+      cout_energie: 1
+      impacts:
+        moral: -10
+        relationnel: 15
+        promotion: 5
+
+    - texte: "Escalader au DSI pour arbitrage budgétaire"
+      cout_energie: 2
+      impacts:
+        moral: 0
+        relationnel: -10
+        promotion: 10
+
+- id: wifi_visiteur_en_panne
+  type: routine
+  titre: "Réseau : Le Wi-Fi de la salle de réunion est aux fraises"
+  description: "Des clients importants sont en réunion, la borne Wi-Fi refuse toute association DHCP."
+  cooldown: 3
+  choix:
+    - texte: "Reboot sauvage de la borne via son interface PoE"
+      cout_energie: 1
+      impacts:
+        technique: 5
+        relationnel: 10
+
+    - texte: "Diagnostiquer le bail DHCP saturé et reconfigurer le pool sur le contrôleur"
+      cout_energie: 3
+      impacts:
+        moral: 5
+        technique: 15
+        relationnel: 10
+        promotion: 5
+
+- id: pause_cafe_syndicat
+  type: routine
+  titre: "Social : Discussion informelle à la machine à café"
+  description: "Les collègues râlent sur le nouveau logiciel RH. Ils te demandent ton avis sur la direction."
+  cooldown: 2
+  choix:
+    - texte: "Rejoindre la contestation et critiquer les décisions du management"
+      cout_energie: 1
+      impacts:
+        moral: 15
+        relationnel: 20
+        promotion: -15
+      flags_ajoutes: ["rebelle_cafe"]
+
+    - texte: "Défendre les contraintes du projet avec diplomatie"
+      cout_energie: 1
+      impacts:
+        moral: -5
+        relationnel: -10
+        promotion: 15
+
+- id: poste_infeste_adware
+  type: routine
+  titre: "Poste de travail : 'Mon PC est lent et m'ouvre des pubs de casino'"
+  description: "Un poste de l'accueil est vérolé par des barres d'outils douteuses après le téléchargement d'un faux convertisseur PDF."
+  cooldown: 3
+  choix:
+    - texte: "Formater et redéployer l'image standard (méthode radicale et propre)"
+      cout_energie: 3
+      impacts:
+        moral: 5
+        technique: 10
+        relationnel: 5
+
+    - texte: "Passer un coup d'antivirus rapide et croiser les doigts"
+      cout_energie: 1
+      impacts:
+        moral: -5
+        technique: -5
+        relationnel: 5

@@ -6,7 +6,7 @@ import yaml
 from src.models import Choice, GameEvent, Player
 
 
-class GameEngine:
+class GameEngine:   
     def __init__(self, player: Player):
         self.player = player
         self.events: List[GameEvent] = []
@@ -36,32 +36,68 @@ class GameEngine:
                         titre=item["titre"],
                         description=item["description"],
                         choix=liste_choix,
+                        cooldown=item.get("cooldown", 1),
+                        unique=item.get("unique", False),
                     )
                     self.events.append(event)
 
-    def appliquer_choix(self, choix: Choice) -> None:
-        """Déduit l'énergie, applique les variations de jauges et stocke les flags."""
-        self.player.consommer_energie(choix.cout_energie)
+    def appliquer_choix(self, choix: Choice, event: GameEvent) -> None:
+            """Déduit l'énergie, applique les impacts et prend en compte les passifs."""
+            self.player.consommer_energie(choix.cout_energie)
 
-        for jauge, delta in choix.impacts.items():
-            self.player.ajuster_jauge(jauge, delta)
+            for jauge, delta in choix.impacts.items():
+                # Passif "Le Passionné" : gain de moral supplémentaire sur les gros chantiers/crises
+                if self.player.passif == "boost_crises" and jauge == "moral":
+                    if event.type == "crise" or event.cooldown >= 4:
+                        delta += 10
+                self.player.ajuster_jauge(jauge, delta)
 
-        for flag in choix.flags_ajoutes:
-            self.player.flags.add(flag)
+            for flag in choix.flags_ajoutes:
+                self.player.flags.add(flag)
 
     def verifier_fin_de_partie(self) -> str | None:
-        """Retourne le nom de la fin si une condition d'arrêt est remplie, sinon None."""
-        if self.player.est_en_burnout():
-            return "Dépression : Burn-out face à la montagne de tickets non résolus."
-        
-        if self.player.promotion <= 0:
-            return "Licenciement : La direction estime que tu n'as pas le profil pour l'équipe."
+            """Vérifie l'arrêt de jeu, avec protection passive."""
+            if self.player.est_en_burnout():
+                return "Dépression : Burn-out face à la montagne de tickets non résolus."
 
-        if self.player.semaine_actuelle > 52:
-            if self.player.promotion >= 75 and self.player.technique >= 70:
-                return "Promotion RSSI : Tu prends les commandes de la sécurité du SI !"
-            if self.player.technique >= 80 and self.player.moral <= 30:
-                return "Retraite à la campagne : Tu as désinstallé Linux pour élever des chèvres dans la Creuse."
-            return "Maintien au poste : Une année de plus au support N1 terminée sain et sauf."
+            # Passif "Le Planqué" : impossible à licencier
+            if self.player.promotion <= 0:
+                if self.player.passif == "immunite_licenciement":
+                    self.player.promotion = 1  # Reste sauvé in extremis
+                else:
+                    return "Licenciement : La direction estime que tu n'as pas le profil pour l'équipe."
 
-        return None
+            if self.player.semaine_actuelle > 52:
+                if self.player.promotion >= 75 and self.player.technique >= 70:
+                    return "Promotion RSSI : Tu prends les commandes de la sécurité du SI !"
+                if self.player.technique >= 80 and self.player.moral <= 30:
+                    return "Retraite à la campagne : Tu as désinstallé Linux pour élever des chèvres dans la Creuse."
+                return "Maintien au poste : Une année de plus au support N1 terminée sain et sauf."
+
+            return None
+
+
+    def obtenir_evenements_disponibles(self) -> List[GameEvent]:
+        """Retourne uniquement les événements qui respectent leur cooldown et leur unicité."""
+        disponibles = []
+        for ev in self.events:
+            # Si l'événement est unique et a déjà été joué
+            if ev.unique and ev.derniere_semaine_jouee != -999:
+                continue
+            
+            # Vérification du cooldown
+            semaines_ecoulees = self.player.semaine_actuelle - ev.derniere_semaine_jouee
+            if ev.derniere_semaine_jouee == -999 or semaines_ecoulees >= ev.cooldown:
+                disponibles.append(ev)
+                
+        return disponibles
+
+    def enregistrer_passage_evenement(self, event: GameEvent) -> None:
+        """Marque la semaine où l'événement a été tiré."""
+        event.derniere_semaine_jouee = self.player.semaine_actuelle
+
+
+def charger_archetypes() -> list[dict]:
+    chemin = Path(__file__).resolve().parent.parent / "data" / "archetypes.yaml"
+    with open(chemin, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or []

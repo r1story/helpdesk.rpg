@@ -7,20 +7,21 @@ from typing import Dict, List, Set
 class Player:
     nom: str
     archetype: str
-    
+    passif: str | None = None  # ex: "immunite_licenciement", "boost_crises"
+
     # Jauges principales (de 0 à 100)
     moral: int = 70
     technique: int = 30
     relationnel: int = 50
     promotion: int = 20
-    
-    # Ressource consommable par tour/semaine
+
+    # Ressource consommable
     energie_max: int = 10
     energie: int = 10
-    
+
     # Progression temporelle
     semaine_actuelle: int = 1
-    
+
     # Flags pour les événements passés et fins secrètes (ex: "sauvegarde_reussie", "hacker_contacted")
     flags: Set[str] = field(default_factory=set)
 
@@ -61,7 +62,10 @@ class Choice:
 @dataclass
 class GameEvent:
     id: str
-    type: str  # "routine", "crise", "pause"
+    type: str  # "routine", "crise", "projet"
     titre: str
     description: str
     choix: List[Choice]
+    cooldown: int = 1  # Nombre de semaines de pause après apparition
+    unique: bool = False  # Si True, disparaît définitivement après avoir été joué
+    derniere_semaine_jouee: int = -999  # Traceur interne

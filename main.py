@@ -3,17 +3,47 @@ import random
 import sys
 import time
 
-from src.engine import GameEngine
+from src.engine import GameEngine, charger_archetypes
 from src.models import Player
 from src.ui import afficher_evenement, afficher_tableau_de_bord, demander_choix, effacer_ecran
+
+
+def selectionner_archetype() -> dict:
+    archetypes = charger_archetypes()
+    
+    if not archetypes:
+        raise ValueError("Aucun archétype trouvé dans data/archetypes.yaml !")
+
+    effacer_ecran()
+    print("=== CHOIX DU PROFIL DU TECHNICIEN ===\n")
+    for idx, arch in enumerate(archetypes, start=1):
+        print(f"[{idx}] {arch['nom']}")
+        print(f"    {arch['description']}\n")
+
+    choix_idx = demander_choix(len(archetypes))
+    return archetypes[choix_idx]
 
 
 def main() -> None:
     effacer_ecran()
     print("=== DÉMARRAGE DU POSTE DE TRAVAIL ===")
     nom = input("Entre le prénom de ton technicien : ").strip() or "Nouveau Tech"
-    
-    joueur = Player(nom=nom, archetype="Stagiaire N1")
+
+    profil = selectionner_archetype()
+    stats = profil["stats"]
+
+    joueur = Player(
+        nom=nom,
+        archetype=profil["nom"],
+        passif=profil.get("passif"),
+        technique=stats["technique"],
+        relationnel=stats["relationnel"],
+        moral=stats["moral"],
+        promotion=stats["promotion"],
+        energie_max=stats["energie_max"],
+        energie=stats["energie_max"],
+    )
+
     moteur = GameEngine(joueur)
 
     if not moteur.events:
@@ -36,34 +66,40 @@ def main() -> None:
         time.sleep(1)
 
         # Boucle d'actions dans la semaine tant qu'il reste de l'énergie
+        # Boucle d'actions dans la semaine tant qu'il reste de l'énergie
         while joueur.energie > 0:
             fin = moteur.verifier_fin_de_partie()
             if fin:
                 break
 
-            # On tire un événement au hasard dans la liste
-            event = random.choice(moteur.events)
+            events_dispo = moteur.obtenir_evenements_disponibles()
+            if not events_dispo:
+                events_dispo = moteur.events
 
-            effacer_ecran()
-            afficher_tableau_de_bord(joueur)
-            afficher_evenement(event)
+            event = random.choice(events_dispo)
 
-            idx_choix = demander_choix(len(event.choix))
-            choix_selectionne = event.choix[idx_choix]
+            # Boucle sur LE MÊME événement tant qu'un choix valide n'est pas fait
+            while True:
+                effacer_ecran()
+                afficher_tableau_de_bord(joueur)
+                afficher_evenement(event)
 
-            # Vérification de l'énergie
-            if joueur.energie < choix_selectionne.cout_energie:
-                print("\n[!] Énergie insuffisante pour cette option ! Appuie sur Entrée.")
-                input()
-                continue
+                idx_choix = demander_choix(len(event.choix))
+                choix_selectionne = event.choix[idx_choix]
 
-            moteur.appliquer_choix(choix_selectionne)
-            print("\nAction appliquée avec succès. Mise à jour des métriques...")
-            time.sleep(1)
+                # Vérification de l'énergie
+                if joueur.energie < choix_selectionne.cout_energie:
+                    print(f"\n[!] Énergie insuffisante ! Il te reste {joueur.energie}⚡, cette action en demande {choix_selectionne.cout_energie}⚡.")
+                    print("Appuie sur Entrée pour rechoisir une option réalisable...")
+                    input()
+                    continue  # Repose la question sur le MÊME événement
 
-        # Fin de semaine
-        joueur.semaine_actuelle += 1
-
+                # Si l'énergie est suffisante, on applique et on sort de la boucle de l'événement
+                moteur.appliquer_choix(choix_selectionne, event)
+                moteur.enregistrer_passage_evenement(event)
+                print("\nAction appliquée avec succès. Mise à jour des métriques...")
+                time.sleep(1)
+                break
 
 if __name__ == "__main__":
     main()

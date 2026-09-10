@@ -1,0 +1,54 @@
+- id: autodidacte
+  nom: "L'Autodidacte"
+  description: "A monté son homelab à 14 ans. Préfère parler à un terminal Bash qu'à un être humain."
+  stats:
+    technique: 55
+    relationnel: 25
+    moral: 70
+    promotion: 20
+    energie_max: 10
+  passif: null
+
+- id: reconverti
+  nom: "Le Reconverti"
+  description: "Ancien gestionnaire administratif. Maîtrise le jargon corporate, les process et la diplomatie."
+  stats:
+    technique: 20
+    relationnel: 65
+    moral: 70
+    promotion: 40
+    energie_max: 10
+  passif: null
+
+- id: diplome
+  nom: "Le Diplômé"
+  description: "Sort frais et dispos d'un cursus réseau/cyber. Équilibré, confiant et plein d'énergie."
+  stats:
+    technique: 40
+    relationnel: 45
+    moral: 80
+    promotion: 25
+    energie_max: 15
+  passif: null
+
+- id: planque
+  nom: "Le Planqué"
+  description: "Inamovible grâce à un vieux CDI blindé. En fait le strict minimum syndical."
+  stats:
+    technique: 15
+    relationnel: 40
+    moral: 85
+    promotion: 10
+    energie_max: 7
+  passif: "immunite_licenciement"
+
+- id: passionne
+  nom: "Le Passionné"
+  description: "Ne compte pas ses heures quand ça devient complexe. S'ennuie vite sur la routine bureautique."
+  stats:
+    technique: 50
+    relationnel: 30
+    moral: 65
+    promotion: 20
+    energie_max: 10
+  passif: "boost_crises"
