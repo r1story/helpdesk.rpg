@@ -1,0 +1,67 @@
+- id: ticket_bourrage_papier
+  type: routine
+  titre: "Incident N1 : L'imprimante du service compta"
+  description: "Bernadette de la compta appelle en panique : l'imprimante réseau refuse de sortir les bulletins de paie. Un voyant rouge clignote."
+  choix:
+    - texte: "Y aller immédiatement et démonter le bac avec le sourire"
+      cout_energie: 2
+      impacts:
+        moral: -10
+        relationnel: 15
+        promotion: 5
+      flags_ajoutes: ["ami_compta"]
+
+    - texte: "Lui expliquer par téléphone comment retirer le papier coincé"
+      cout_energie: 1
+      impacts:
+        moral: -5
+        relationnel: -5
+        technique: 0
+
+    - texte: "Classer le ticket sans suite avec la mention 'Erreur utilisateur non reproductible'"
+      cout_energie: 0
+      impacts:
+        moral: 5
+        relationnel: -15
+        promotion: -10
+      flags_ajoutes: ["flemmard"]
+
+- id: ticket_mot_de_passe_dg
+  type: routine
+  titre: "Ticket VIP : Perte d'accès du Directeur Général"
+  description: "Le DG est bloqué devant son écran après avoir tapé cinq fois son mot de passe avec le verrouillage majuscule activé. Il exige un reset sans passer par la procédure standard."
+  choix:
+    - texte: "Appliquer la procédure de sécurité stricte : vérification d'identité et ticket formel"
+      cout_energie: 2
+      impacts:
+        moral: 5
+        technique: 5
+        promotion: -10
+      flags_ajoutes: ["rigueur_securite"]
+
+    - texte: "Lui changer son mot de passe en 'Azerty123*' à distance immédiatement"
+      cout_energie: 1
+      impacts:
+        moral: -5
+        relationnel: 10
+        promotion: 15
+      flags_ajoutes: ["compromission_securite"]
+
+- id: chantier_sauvegarde_auto
+  type: routine
+  titre: "Amélioration : Script de sauvegarde préventive"
+  description: "Le serveur de partage de fichiers n'a pas de sauvegarde automatisée. Personne ne te l'a demandé, mais un crash serait dramatique."
+  choix:
+    - texte: "Prendre sur son temps pour écrire et tester un script de snapshot"
+      cout_energie: 4
+      impacts:
+        moral: 10
+        technique: 20
+        promotion: 5
+      flags_ajoutes: ["sauvegardes_en_place"]
+
+    - texte: "Laisser tourner tel quel, ce n'est pas ta fiche de poste"
+      cout_energie: 0
+      impacts:
+        moral: 0
+        technique: -5
