@@ -6,7 +6,13 @@ import time
 from src.engine import GameEngine, charger_archetypes
 from src.models import Player
 from src.ui import afficher_evenement, afficher_tableau_de_bord, demander_choix, effacer_ecran
-
+from src.ui import (
+    afficher_bilan_action,
+    afficher_evenement,
+    afficher_tableau_de_bord,
+    demander_choix,
+    effacer_ecran,
+)
 
 def selectionner_archetype() -> dict:
     archetypes = charger_archetypes()
@@ -66,7 +72,6 @@ def main() -> None:
         time.sleep(1)
 
         # Boucle d'actions dans la semaine tant qu'il reste de l'énergie
-        # Boucle d'actions dans la semaine tant qu'il reste de l'énergie
         while joueur.energie > 0:
             fin = moteur.verifier_fin_de_partie()
             if fin:
@@ -84,7 +89,15 @@ def main() -> None:
                 afficher_tableau_de_bord(joueur)
                 afficher_evenement(event)
 
-                idx_choix = demander_choix(len(event.choix))
+                idx_choix = demander_choix(len(event.choix), peut_quitter=True, username=joueur.nom)
+
+                # Sortie de secours : le joueur quitte le bureau pour la semaine
+                if idx_choix == -1:
+                    print("\nTu fermes ta session et quittes le bureau pour le week-end...")
+                    joueur.energie = 0  # Force la fin de la semaine
+                    time.sleep(1)
+                    break
+
                 choix_selectionne = event.choix[idx_choix]
 
                 # Vérification de l'énergie
@@ -92,14 +105,18 @@ def main() -> None:
                     print(f"\n[!] Énergie insuffisante ! Il te reste {joueur.energie}⚡, cette action en demande {choix_selectionne.cout_energie}⚡.")
                     print("Appuie sur Entrée pour rechoisir une option réalisable...")
                     input()
-                    continue  # Repose la question sur le MÊME événement
+                    continue
 
-                # Si l'énergie est suffisante, on applique et on sort de la boucle de l'événement
+                # Si l'énergie est suffisante, on applique et on avance
                 moteur.appliquer_choix(choix_selectionne, event)
                 moteur.enregistrer_passage_evenement(event)
-                print("\nAction appliquée avec succès. Mise à jour des métriques...")
-                time.sleep(1)
+                afficher_bilan_action(choix_selectionne)
+                print("Appuie sur Entrée pour continuer...")
+                input()
                 break
+
+        # Fin de semaine
+        joueur.semaine_actuelle += 1
 
 if __name__ == "__main__":
     main()
