@@ -14,6 +14,17 @@ from src.ui import (
     effacer_ecran,
 )
 
+from src.engine import (
+    GameEngine,
+    charger_archetypes,
+    charger_partie,
+    sauvegarder_partie,
+    supprimer_sauvegarde,
+)
+
+from src.achievements import AchievementManager
+from src.ui import afficher_pop_up_succes
+
 def selectionner_archetype() -> dict:
     archetypes = charger_archetypes()
     
@@ -32,31 +43,44 @@ def selectionner_archetype() -> dict:
 
 def main() -> None:
     effacer_ecran()
-    print("=== DÉMARRAGE DU POSTE DE TRAVAIL ===")
-    nom = input("Entre le prénom de ton technicien : ").strip() or "Nouveau Tech"
+    
+    # 1. Vérification d'une sauvegarde existante
+    partie_sauvegardee = charger_partie()
+    joueur = None
 
-    profil = selectionner_archetype()
-    stats = profil["stats"]
+    if partie_sauvegardee:
+        print("=== SESSION ANTÉRIEURE DÉTECTÉE ===")
+        print(f"Technicien : {partie_sauvegardee.nom} ({partie_sauvegardee.archetype})")
+        print(f"Progression : Semaine {partie_sauvegardee.semaine_actuelle}/52\n")
+        print("  [1] Reprendre le poste")
+        print("  [2] Réinitialiser et écraser la session\n")
+        choix_save = demander_choix(2)
+        if choix_save == 0:  # Option 1
+            joueur = partie_sauvegardee
 
-    joueur = Player(
-        nom=nom,
-        archetype=profil["nom"],
-        passif=profil.get("passif"),
-        technique=stats["technique"],
-        relationnel=stats["relationnel"],
-        moral=stats["moral"],
-        promotion=stats["promotion"],
-        energie_max=stats["energie_max"],
-        energie=stats["energie_max"],
-    )
+    # 2. Si pas de sauvegarde ou reset choisi
+    if not joueur:
+        effacer_ecran()
+        print("=== DÉMARRAGE DU POSTE DE TRAVAIL ===")
+        nom = input("Entre le prénom de ton technicien : ").strip() or "Nouveau Tech"
+        profil = selectionner_archetype()
+        stats = profil["stats"]
+
+        joueur = Player(
+            nom=nom,
+            archetype=profil["nom"],
+            passif=profil.get("passif"),
+            technique=stats["technique"],
+            relationnel=stats["relationnel"],
+            moral=stats["moral"],
+            promotion=stats["promotion"],
+            energie_max=stats["energie_max"],
+            energie=stats["energie_max"],
+        )
 
     moteur = GameEngine(joueur)
 
-    if not moteur.events:
-        print("[ERREUR] Aucun événement chargé depuis data/events/. Vérifie les fichiers YAML.")
-        sys.exit(1)
-
-    # Boucle de jeu (semaine par semaine)
+    # 3. Boucle principale
     while True:
         fin = moteur.verifier_fin_de_partie()
         if fin:
@@ -64,27 +88,59 @@ def main() -> None:
             afficher_tableau_de_bord(joueur)
             print("=== FIN DE PARTIE ===")
             print(f"Résultat : {fin}\n")
+
+            # Gestion des succès selon la fin
+            ach_manager = AchievementManager()
+            id_succes = None
+
+            if "Burn-out" in fin:
+                id_succes = "fin_burnout"
+            elif "Licenciement" in fin:
+                id_succes = "fin_licenciement"
+            elif "RSSI" in fin:
+                id_succes = "fin_rssi"
+            elif "chèvres" in fin:
+                id_succes = "fin_campagne"
+            elif "Maintien au poste" in fin:
+                id_succes = "fin_survie"
+
+            if id_succes and ach_manager.deverrouiller(id_succes):
+                succes = ach_manager.achievements[id_succes]
+                afficher_pop_up_succes(succes["titre"], succes["description"])
+
+            supprimer_sauvegarde()
+            input("Appuie sur Entrée pour quitter...")
             break
+
+        # Sauvegarde automatique au début de chaque nouvelle semaine
+        sauvegarder_partie(joueur)
 
         joueur.reinitialiser_energie()
         effacer_ecran()
         print(f"--- DÉBUT DE LA SEMAINE {joueur.semaine_actuelle} ---")
         time.sleep(1)
 
-        # Boucle d'actions dans la semaine tant qu'il reste de l'énergie
+        
+        # Détection d'une crise scriptée pour cette semaine
+        evenement_scripté = moteur.obtenir_evenement_scripté_semaine()
+
         while joueur.energie > 0:
             fin = moteur.verifier_fin_de_partie()
             if fin:
                 break
 
-            events_dispo = moteur.obtenir_evenements_disponibles()
-            if not events_dispo:
-                events_dispo = moteur.events
+            # Si une crise est en attente, elle passe obligatoirement en premier
+            if crise_active:
+                event = crise_active
+                crise_active = None  # Consommée pour la semaine
+            else:
+                events_dispo = moteur.obtenir_evenements_disponibles()
+                if not events_dispo:
+                    events_dispo = [e for e in moteur.events if e.semaine_declenchement is None]
+                event = random.choice(events_dispo)
 
-            event = random.choice(events_dispo)
 
-            # Boucle sur LE MÊME événement tant qu'un choix valide n'est pas fait
-            while True:
+                while True:
                 effacer_ecran()
                 afficher_tableau_de_bord(joueur)
                 afficher_evenement(event)

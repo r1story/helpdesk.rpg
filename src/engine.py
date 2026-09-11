@@ -2,10 +2,34 @@
 from pathlib import Path
 from typing import List
 import yaml
+import json
 
 from src.models import Choice, GameEvent, Player
 
+CHEMIN_SAUVEGARDE = Path(__file__).resolve().parent.parent / "savegame.json"
 
+def sauvegarder_partie(joueur: Player) -> None:
+    """Écrit l'état actuel du joueur dans savegame.json."""
+    with open(CHEMIN_SAUVEGARDE, "w", encoding="utf-8") as f:
+        json.dump(joueur.to_dict(), f, indent=2, ensure_ascii=False)
+
+
+def charger_partie() -> Player | None:
+    """Charge une partie existante, ou retourne None si aucun fichier n'existe."""
+    if not CHEMIN_SAUVEGARDE.exists():
+        return None
+    try:
+        with open(CHEMIN_SAUVEGARDE, "r", encoding="utf-8") as f:
+            donnees = json.load(f)
+            return Player.from_dict(donnees)
+    except (json.JSONDecodeError, KeyError):
+        return None
+
+
+def supprimer_sauvegarde() -> None:
+    """Supprime la sauvegarde en cas de fin de partie ou de reset."""
+    if CHEMIN_SAUVEGARDE.exists():
+        CHEMIN_SAUVEGARDE.unlink()
 class GameEngine:   
     def __init__(self, player: Player):
         self.player = player
@@ -38,8 +62,21 @@ class GameEngine:
                         choix=liste_choix,
                         cooldown=item.get("cooldown", 1),
                         unique=item.get("unique", False),
+                        semaine_declenchement=item.get("semaine_declenchement"),
+                        archetype_requis=item.get("archetype_requis"),
                     )
                     self.events.append(event)
+    def obtenir_evenement_scripté_semaine(self) -> GameEvent | None:
+    """Retourne la crise ou l'événement de classe prévu pour cette semaine."""
+    for ev in self.events:
+        if ev.semaine_declenchement == self.player.semaine_actuelle and ev.derniere_semaine_jouee == -999:
+            # S'il y a une restriction de classe, on vérifie l'archétype du joueur
+            if ev.archetype_requis:
+                # Normalisation pour comparer (ex: "autodidacte" dans "l'autodidacte")
+                if ev.archetype_requis.lower() not in self.player.archetype.lower():
+                    continue
+            return ev
+    return None
 
     def appliquer_choix(self, choix: Choice, event: GameEvent) -> None:
             """Déduit l'énergie, applique les impacts et prend en compte les passifs."""
@@ -78,18 +115,19 @@ class GameEngine:
 
 
     def obtenir_evenements_disponibles(self) -> List[GameEvent]:
-        """Retourne uniquement les événements qui respectent leur cooldown et leur unicité."""
         disponibles = []
         for ev in self.events:
-            # Si l'événement est unique et a déjà été joué
+            # Les crises avec semaine fixe ne sont pas tirées au hasard
+            if ev.semaine_declenchement is not None:
+                continue
+
             if ev.unique and ev.derniere_semaine_jouee != -999:
                 continue
-            
-            # Vérification du cooldown
+
             semaines_ecoulees = self.player.semaine_actuelle - ev.derniere_semaine_jouee
             if ev.derniere_semaine_jouee == -999 or semaines_ecoulees >= ev.cooldown:
                 disponibles.append(ev)
-                
+
         return disponibles
 
     def enregistrer_passage_evenement(self, event: GameEvent) -> None:

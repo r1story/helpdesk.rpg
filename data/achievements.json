@@ -1,0 +1,44 @@
+{
+  "fin_burnout": {
+    "titre": "Victime du Backlog",
+    "description": "Atteindre 0 de moral et sombrer dans le burn-out.",
+    "debloque": false,
+    "date": null
+  },
+  "fin_licenciement": {
+    "titre": "Retour à Pôle Emploi",
+    "description": "Se faire virer pour promotion tombée à zéro.",
+    "debloque": false,
+    "date": null
+  },
+  "fin_rssi": {
+    "titre": "Le Grand Patron Cyber",
+    "description": "Terminer l'année et décrocher le poste de RSSI.",
+    "debloque": false,
+    "date": null
+  },
+  "fin_campagne": {
+    "titre": "Éleveur de chèvres",
+    "description": "Être trop compétent pour ce monde et partir élever des chèvres dans la Creuse.",
+    "debloque": false,
+    "date": null
+  },
+  "fin_survie": {
+    "titre": "Survivant du N1",
+    "description": "Terminer les 52 semaines sans se faire virer ni craquer.",
+    "debloque": false,
+    "date": null
+  },
+  "passionne_homelab_boss": {
+    "titre": "Projet de l'Ombre",
+    "description": "En tant que Passionné, déployer une solution perso applaudie par la direction.",
+    "debloque": false,
+    "date": null
+  },
+  "planque_sieste_master": {
+    "titre": "Fonctionnaire du Privé",
+    "description": "En tant que Planqué, esquiver 10 tickets sans aucune conséquence.",
+    "debloque": false,
+    "date": null
+  }
+}

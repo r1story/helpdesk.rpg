@@ -49,6 +49,39 @@ class Player:
         """Condition de défaite immédiate."""
         return self.moral <= 0
 
+    def to_dict(self) -> dict:
+            """Convertit l'état du joueur en dictionnaire prêt pour le JSON."""
+            return {
+                "nom": self.nom,
+                "archetype": self.archetype,
+                "passif": self.passif,
+                "moral": self.moral,
+                "technique": self.technique,
+                "relationnel": self.relationnel,
+                "promotion": self.promotion,
+                "energie_max": self.energie_max,
+                "energie": self.energie,
+                "semaine_actuelle": self.semaine_actuelle,
+                "flags": list(self.flags),  # Conversion set -> list pour le JSON
+            }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Player":
+        """Recrée une instance de Player à partir d'un dictionnaire."""
+        flags_set = set(data.get("flags", []))
+        return cls(
+            nom=data["nom"],
+            archetype=data["archetype"],
+            passif=data.get("passif"),
+            moral=data["moral"],
+            technique=data["technique"],
+            relationnel=data["relationnel"],
+            promotion=data["promotion"],
+            energie_max=data["energie_max"],
+            energie=data["energie"],
+            semaine_actuelle=data["semaine_actuelle"],
+            flags=flags_set,
+        )
 
 @dataclass
 class Choice:
@@ -62,10 +95,13 @@ class Choice:
 @dataclass
 class GameEvent:
     id: str
-    type: str  # "routine", "crise", "projet"
+    type: str  # "routine", "crise", "special"
     titre: str
     description: str
     choix: List[Choice]
-    cooldown: int = 1  # Nombre de semaines de pause après apparition
-    unique: bool = False  # Si True, disparaît définitivement après avoir été joué
-    derniere_semaine_jouee: int = -999  # Traceur interne
+    cooldown: int = 1
+    unique: bool = False
+    semaine_declenchement: int | None = None
+    archetype_requis: str | None = None  # id de l'archétype requis (ex: "autodidacte")
+    derniere_semaine_jouee: int = -999
+

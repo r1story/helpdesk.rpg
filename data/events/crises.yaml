@@ -1,0 +1,94 @@
+- id: crise_switch_core
+  type: crise
+  titre: "Écran noir sur le LAN : Switchs Core réinitialisés"
+  description: "Coupure de courant violente dans la baie principale. L'onduleur n'a pas tenu et les switchs de cœur de réseau ont rebooté sans conf : le senior n'avait jamais sauvegardé la running-config."
+  unique: true
+  semaine_declenchement: 12
+  choix:
+    - texte: "Passer la nuit blanche à reconstituer les VLANs et le routage de mémoire"
+      cout_energie: 6
+      impacts:
+        moral: -20
+        technique: 25
+        promotion: 15
+        relationnel: 10
+      flags_ajoutes: ["sauveur_reseau"]
+
+    - texte: "Laisser l'ingénieur réseau senior assumer l'absence de sauvegarde devant la direction"
+      cout_energie: 1
+      impacts:
+        moral: 5
+        relationnel: -25
+        promotion: -5
+      flags_ajoutes: ["rivalite_senior"]
+
+    - texte: "Restaurer un vieux backup non officiel que tu avais dumpé en douce le mois dernier"
+      cout_energie: 3
+      impacts:
+        moral: 10
+        technique: 15
+        promotion: 10
+      flags_ajoutes: ["shadow_admin"]
+
+- id: crise_audit_anssi
+  type: crise
+  titre: "Conformité : Audit de cybersécurité inopiné"
+  description: "Deux auditeurs externes débarquent pour vérifier l'application des recommandations d'hygiène informatique (mots de passe, segmentation, gestion des habilitations)."
+  unique: true
+  semaine_declenchement: 26
+  choix:
+    - texte: "Jouer la transparence totale en montrant le fichier Excel partagé des mots de passe admin"
+      cout_energie: 2
+      impacts:
+        moral: -10
+        technique: 10
+        promotion: -25
+        relationnel: -10
+      flags_ajoutes: ["scandale_securite"]
+
+    - texte: "Verrouiller les comptes dormants et masquer les dossiers partagés ouverts en urgence"
+      cout_energie: 5
+      impacts:
+        moral: -15
+        technique: 20
+        promotion: 15
+      flags_ajoutes: ["maquillage_audit"]
+
+    - texte: "Leur servir le café et noyer le poisson avec un discours corporate ultra-rodé"
+      cout_energie: 2
+      impacts:
+        moral: 5
+        relationnel: 20
+        promotion: 10
+      flags_requis: ["reconverti"]
+
+- id: crise_ransomware_vendredi
+  type: crise
+  titre: "Alerte Rouge : Ransomware un vendredi à 17h15"
+  description: "Des fichiers '.locked' apparaissent sur le NAS partagé. Une note de rançon exige 5 Bitcoins avant lundi matin."
+  unique: true
+  semaine_declenchement: 40
+  choix:
+    - texte: "Couper physiquement les arrivées réseau et restaurer les snapshots immuables"
+      cout_energie: 7
+      impacts:
+        moral: -15
+        technique: 30
+        promotion: 20
+      flags_ajoutes: ["heros_cyber"]
+
+    - texte: "Contacter discrètement les attaquants via Tor pour négocier la clé"
+      cout_energie: 3
+      impacts:
+        moral: -10
+        technique: 15
+        relationnel: -20
+      flags_ajoutes: ["pacte_avec_le_diable"]
+
+    - texte: "Éteindre ton PC portable, prendre ton manteau et déclarer que ton contrat s'arrête à 17h"
+      cout_energie: 0
+      impacts:
+        moral: 25
+        promotion: -40
+        relationnel: -30
+      flags_ajoutes: ["desertion_totale"]

@@ -131,3 +131,13 @@ def demander_choix(nb_options: int, peut_quitter: bool = False, username: str = 
                 return valeur - 1
         msg = f"0 et {nb_options}" if peut_quitter else f"1 et {nb_options}"
         print(f"{ROUGE}Entrée invalide. Choisis entre {msg}.{RESET}")
+
+
+def afficher_pop_up_succes(titre: str, description: str) -> None:
+    """Affiche une bannière dorée lors d'un déverrouillage."""
+    print(f"\n{JAUNE}{BOLD}┌{'─' * 60}┐{RESET}")
+    print(f"{JAUNE}{BOLD}│ 🏆 SUCCÈS DÉVERROUILLÉ !                                   │{RESET}")
+    print(f"{JAUNE}{BOLD}├{'─' * 60}┤{RESET}")
+    print(f"{JAUNE}{BOLD}│ {BLANC}{titre:<58}{JAUNE}{BOLD} │{RESET}")
+    print(f"{JAUNE}{BOLD}│ {DIM}{description:<58}{RESET}{JAUNE}{BOLD} │{RESET}")
+    print(f"{JAUNE}{BOLD}└{'─' * 60}┘{RESET}\n")

@@ -1,0 +1,111 @@
+- id: special_autodidacte_dotfiles
+  type: special
+  titre: "Hérésie bureautique : Le poste Windows 11 d'entreprise"
+  description: "Après un mois sur un poste Windows verrouillé par GPO, tes mains tremblent. Tu rêves d'un terminal en mosaïque, de raccourcis Vim et d'un noyau personnalisé."
+  unique: true
+  semaine_declenchement: 4
+  archetype_requis: "autodidacte"
+  choix:
+    - texte: "Installer discrètement WSL2 avec une distribution Arch et masquer l'icône"
+      cout_energie: 3
+      impacts:
+        moral: 25
+        technique: 15
+        promotion: -5
+      flags_ajoutes: ["wsl_tueur"]
+
+    - texte: "Prendre sur toi et utiliser PowerShell comme tout le monde"
+      cout_energie: 1
+      impacts:
+        moral: -15
+        technique: 5
+        promotion: 10
+
+- id: special_reconverti_process
+  type: special
+  titre: "Absence de gouvernance : Le désert documentaire"
+  description: "Aucun schéma réseau à jour, zéro procédure pour les arrivées/départs, tout est géré à la mémoire par les techniciens."
+  unique: true
+  semaine_declenchement: 4
+  archetype_requis: "reconverti"
+  choix:
+    - texte: "Monter un wiki interne propre et formaliser les 5 procédures critiques"
+      cout_energie: 4
+      impacts:
+        moral: 10
+        relationnel: 15
+        promotion: 20
+      flags_ajoutes: ["maitre_du_wiki"]
+
+    - texte: "Laisser couler : moins il y a d'écrits, moins on a de comptes à rendre"
+      cout_energie: 0
+      impacts:
+        moral: 5
+        promotion: -10
+
+- id: special_diplome_cours_vs_realite
+  type: special
+  titre: "Choc théorique : Le serveur sous un bureau poussiéreux"
+  description: "À l'école, on t'a appris les salles blanches climatisées et les baies redondées. Ici, le serveur de compta est posé à même la moquette à côté de la poubelle."
+  unique: true
+  semaine_declenchement: 4
+  archetype_requis: "diplome"
+  choix:
+    - texte: "Rédiger un audit de non-conformité alarmiste et l'envoyer au DSI"
+      cout_energie: 2
+      impacts:
+        moral: -10
+        relationnel: -15
+        promotion: 15
+      flags_ajoutes: ["zélé_académique"]
+
+    - texte: "Acheter un socle en bois à 10€ et surélever la tour sans faire de vagues"
+      cout_energie: 1
+      impacts:
+        moral: 10
+        relationnel: 15
+        technique: 5
+
+- id: special_planque_sieste_local
+  type: special
+  titre: "Opportunisme : La découverte du local archives"
+  description: "Au fond du couloir du -1, tu découvres un local d'archives ventilé, insonorisé, sans caméra et doté d'un vieux canapé en cuir."
+  unique: true
+  semaine_declenchement: 4
+  archetype_requis: "planque"
+  choix:
+    - texte: "En faire ton QG secret pour faire la sieste entre 13h et 15h"
+      cout_energie: 0
+      impacts:
+        moral: 30
+        promotion: -5
+      flags_ajoutes: ["qg_sieste"]
+
+    - texte: "Nettoyer l'espace pour y stocker les cartons de pièces de rechange"
+      cout_energie: 3
+      impacts:
+        moral: -15
+        promotion: 10
+        relationnel: 10
+
+- id: special_passionne_homelab_secret
+  type: special
+  titre: "Labo clandestin : L'hyperviseur sous le bureau"
+  description: "Tu as récupéré un vieux Dell PowerEdge mis au rebut pour faire tourner Proxmox et tes conteneurs Docker de test."
+  unique: true
+  semaine_declenchement: 4
+  archetype_requis: "passionne"
+  choix:
+    - texte: "Y héberger des services utiles pour les collègues (partage rapide, forge git)"
+      cout_energie: 4
+      impacts:
+        moral: 25
+        technique: 25
+        relationnel: 15
+      flags_ajoutes: ["homelab_clandestin"]
+
+    - texte: "L'éteindre pour respecter strictement la charte informatique"
+      cout_energie: 0
+      impacts:
+        moral: -25
+        promotion: 10
