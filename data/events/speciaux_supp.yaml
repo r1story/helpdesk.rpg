@@ -1,0 +1,44 @@
+- id: pose_conges_ete
+  type: special
+  titre: "RH : Pose des congés d'été"
+  description: "C'est la période estivale. Tu as des RTT et des congés payés à solder. Deux semaines au soleil te feraient le plus grand bien, mais les collègues restants devront assumer le N1 tout seuls."
+  unique: true
+  semaine_declenchement: 30
+  choix:
+    - texte: "Poser 2 semaines et déconnecter totalement (Slack désinstallé)"
+      cout_energie: 0
+      impacts:
+        moral: 25
+        relationnel: -20
+        promotion: -5
+      flags_ajoutes: ["vacances_ete_prises"]
+
+    - texte: "Rester au bureau pour couvrir les urgences et accumuler les points corporate"
+      cout_energie: 2
+      impacts:
+        moral: -15
+        relationnel: 10
+        promotion: 15
+      flags_ajoutes: ["vacances_refusees"]
+
+
+- id: pose_conges_hiver
+  type: special
+  titre: "RH : Congés des fêtes de fin d'année"
+  description: "Dernière ligne droite de décembre. Tout le monde pose sa semaine entre Noël et le Nouvel An. Le planning d'astreinte est tendu."
+  unique: true
+  semaine_declenchement: 50
+  choix:
+    - texte: "Prendre sa semaine pour fêter ça en famille (+3 Énergie & Tech en rentrant)"
+      cout_energie: 0
+      impacts:
+        moral: 20
+        relationnel: -15
+      flags_ajoutes: ["vacances_hiver_prises"]
+
+    - texte: "Tenir la permanence seul au support pendant que l'entreprise tourne au ralenti"
+      cout_energie: 1
+      impacts:
+        moral: -10
+        relationnel: 15
+        promotion: 15

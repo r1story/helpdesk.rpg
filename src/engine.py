@@ -1,12 +1,13 @@
 """src/engine.py : Moteur logique du jeu."""
+import json
 from pathlib import Path
 from typing import List
 import yaml
-import json
 
 from src.models import Choice, GameEvent, Player
 
 CHEMIN_SAUVEGARDE = Path(__file__).resolve().parent.parent / "savegame.json"
+
 
 def sauvegarder_partie(joueur: Player) -> None:
     """Écrit l'état actuel du joueur dans savegame.json."""
@@ -30,7 +31,16 @@ def supprimer_sauvegarde() -> None:
     """Supprime la sauvegarde en cas de fin de partie ou de reset."""
     if CHEMIN_SAUVEGARDE.exists():
         CHEMIN_SAUVEGARDE.unlink()
-class GameEngine:   
+
+
+def charger_archetypes() -> list[dict]:
+    """Charge la configuration des archétypes depuis le YAML."""
+    chemin = Path(__file__).resolve().parent.parent / "data" / "archetypes.yaml"
+    with open(chemin, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or []
+
+
+class GameEngine:
     def __init__(self, player: Player):
         self.player = player
         self.events: List[GameEvent] = []
@@ -39,7 +49,7 @@ class GameEngine:
     def charger_evenements(self) -> None:
         """Charge et parse tous les fichiers YAML du dossier data/events/."""
         chemin_events = Path(__file__).resolve().parent.parent / "data" / "events"
-        
+
         for fichier_yaml in chemin_events.glob("*.yaml"):
             with open(fichier_yaml, "r", encoding="utf-8") as f:
                 donnees = yaml.safe_load(f) or []
@@ -66,58 +76,56 @@ class GameEngine:
                         archetype_requis=item.get("archetype_requis"),
                     )
                     self.events.append(event)
+
     def obtenir_evenement_scripté_semaine(self) -> GameEvent | None:
-    """Retourne la crise ou l'événement de classe prévu pour cette semaine."""
-    for ev in self.events:
-        if ev.semaine_declenchement == self.player.semaine_actuelle and ev.derniere_semaine_jouee == -999:
-            # S'il y a une restriction de classe, on vérifie l'archétype du joueur
-            if ev.archetype_requis:
-                # Normalisation pour comparer (ex: "autodidacte" dans "l'autodidacte")
-                if ev.archetype_requis.lower() not in self.player.archetype.lower():
-                    continue
-            return ev
-    return None
+        """Retourne la crise ou l'événement de classe prévu pour cette semaine."""
+        for ev in self.events:
+            if ev.semaine_declenchement == self.player.semaine_actuelle and ev.derniere_semaine_jouee == -999:
+                if ev.archetype_requis:
+                    if ev.archetype_requis.lower() not in self.player.archetype.lower():
+                        continue
+                return ev
+        return None
 
     def appliquer_choix(self, choix: Choice, event: GameEvent) -> None:
-            """Déduit l'énergie, applique les impacts et prend en compte les passifs."""
-            self.player.consommer_energie(choix.cout_energie)
+        """Déduit l'énergie, applique les impacts et prend en compte les passifs."""
+        self.player.consommer_energie(choix.cout_energie)
 
-            for jauge, delta in choix.impacts.items():
-                # Passif "Le Passionné" : gain de moral supplémentaire sur les gros chantiers/crises
-                if self.player.passif == "boost_crises" and jauge == "moral":
-                    if event.type == "crise" or event.cooldown >= 4:
-                        delta += 10
-                self.player.ajuster_jauge(jauge, delta)
+        for jauge, delta in choix.impacts.items():
+            if self.player.passif == "boost_crises" and jauge == "moral":
+                if event.type == "crise" or event.cooldown >= 4:
+                    delta += 10
+            self.player.ajuster_jauge(jauge, delta)
 
-            for flag in choix.flags_ajoutes:
-                self.player.flags.add(flag)
+        for flag in choix.flags_ajoutes:
+            self.player.flags.add(flag)
 
     def verifier_fin_de_partie(self) -> str | None:
             """Vérifie l'arrêt de jeu, avec protection passive."""
             if self.player.est_en_burnout():
-                return "Dépression : Burn-out face à la montagne de tickets non résolus."
+                return "Rupture de période d'essai : Burn-out face à la montagne de tickets."
 
-            # Passif "Le Planqué" : impossible à licencier
             if self.player.promotion <= 0:
                 if self.player.passif == "immunite_licenciement":
-                    self.player.promotion = 1  # Reste sauvé in extremis
+                    self.player.promotion = 1
                 else:
-                    return "Licenciement : La direction estime que tu n'as pas le profil pour l'équipe."
+                    return "Période d'essai non renouvelée : Le management met fin à ton contrat."
 
-            if self.player.semaine_actuelle > 52:
-                if self.player.promotion >= 75 and self.player.technique >= 70:
-                    return "Promotion RSSI : Tu prends les commandes de la sécurité du SI !"
+            # Terminus : semaine 26 (fin des 6 mois)
+            if self.player.semaine_actuelle > 26:
+                if self.player.promotion >= 70 and self.player.technique >= 75:
+                    return "Promotion RSSI : Période d'essai pulvérisée ! Tu es propulsé à la tête de la cyber."
                 if self.player.technique >= 80 and self.player.moral <= 30:
                     return "Retraite à la campagne : Tu as désinstallé Linux pour élever des chèvres dans la Creuse."
-                return "Maintien au poste : Une année de plus au support N1 terminée sain et sauf."
+                if self.player.promotion >= 40:
+                    return "CDI Confirmé : Période d'essai validée avec succès, tu intègres officiellement l'équipe !"
+                return "Période d'essai renouvelée de justesse : Tu restes sur la sellette pour 3 mois de plus."
 
             return None
-
 
     def obtenir_evenements_disponibles(self) -> List[GameEvent]:
         disponibles = []
         for ev in self.events:
-            # Les crises avec semaine fixe ne sont pas tirées au hasard
             if ev.semaine_declenchement is not None:
                 continue
 
@@ -133,9 +141,3 @@ class GameEngine:
     def enregistrer_passage_evenement(self, event: GameEvent) -> None:
         """Marque la semaine où l'événement a été tiré."""
         event.derniere_semaine_jouee = self.player.semaine_actuelle
-
-
-def charger_archetypes() -> list[dict]:
-    chemin = Path(__file__).resolve().parent.parent / "data" / "archetypes.yaml"
-    with open(chemin, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or []

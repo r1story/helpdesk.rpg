@@ -3,7 +3,7 @@
   titre: "Hérésie bureautique : Le poste Windows 11 d'entreprise"
   description: "Après un mois sur un poste Windows verrouillé par GPO, tes mains tremblent. Tu rêves d'un terminal en mosaïque, de raccourcis Vim et d'un noyau personnalisé."
   unique: true
-  semaine_declenchement: 4
+  semaine_declenchement: 2
   archetype_requis: "autodidacte"
   choix:
     - texte: "Installer discrètement WSL2 avec une distribution Arch et masquer l'icône"
@@ -26,7 +26,7 @@
   titre: "Absence de gouvernance : Le désert documentaire"
   description: "Aucun schéma réseau à jour, zéro procédure pour les arrivées/départs, tout est géré à la mémoire par les techniciens."
   unique: true
-  semaine_declenchement: 4
+  semaine_declenchement: 2
   archetype_requis: "reconverti"
   choix:
     - texte: "Monter un wiki interne propre et formaliser les 5 procédures critiques"
@@ -48,7 +48,7 @@
   titre: "Choc théorique : Le serveur sous un bureau poussiéreux"
   description: "À l'école, on t'a appris les salles blanches climatisées et les baies redondées. Ici, le serveur de compta est posé à même la moquette à côté de la poubelle."
   unique: true
-  semaine_declenchement: 4
+  semaine_declenchement: 2
   archetype_requis: "diplome"
   choix:
     - texte: "Rédiger un audit de non-conformité alarmiste et l'envoyer au DSI"
@@ -71,7 +71,7 @@
   titre: "Opportunisme : La découverte du local archives"
   description: "Au fond du couloir du -1, tu découvres un local d'archives ventilé, insonorisé, sans caméra et doté d'un vieux canapé en cuir."
   unique: true
-  semaine_declenchement: 4
+  semaine_declenchement: 2
   archetype_requis: "planque"
   choix:
     - texte: "En faire ton QG secret pour faire la sieste entre 13h et 15h"
@@ -93,7 +93,7 @@
   titre: "Labo clandestin : L'hyperviseur sous le bureau"
   description: "Tu as récupéré un vieux Dell PowerEdge mis au rebut pour faire tourner Proxmox et tes conteneurs Docker de test."
   unique: true
-  semaine_declenchement: 4
+  semaine_declenchement: 2
   archetype_requis: "passionne"
   choix:
     - texte: "Y héberger des services utiles pour les collègues (partage rapide, forge git)"
@@ -109,3 +109,71 @@
       impacts:
         moral: -25
         promotion: 10
+
+- id: mission_formation_pro
+  type: special
+  titre: "RH : Session de formation certifiante"
+  description: "L'entreprise t'envoie 2 semaines en centre de formation pour une session intensive sur les architectures réseaux et la sécurité des environnements virtualisés. Deux semaines loin des tickets N1 !"
+  unique: true
+  semaine_declenchement: 4
+  choix:
+    - texte: "Suivre religieusement les cours, faire tous les labs et passer la certif"
+      cout_energie: 4
+      impacts:
+        technique: 25
+        promotion: 10
+        moral: 5
+      flags_ajoutes: ["formation_assidue"]
+
+    - texte: "Profiter du buffet traiteur, faire des pauses café de 45 min et survoler les TP"
+      cout_energie: 1
+      impacts:
+        moral: 20
+        technique: 5
+        relationnel: 10
+      flags_ajoutes: ["formation_touriste"]
+
+    - texte: "Sécher les ateliers de l'après-midi pour avancer sur tes scripts perso"
+      cout_energie: 3
+      impacts:
+        technique: 15
+        moral: 15
+        promotion: -5
+      flags_ajoutes: ["formation_autodidacte"]
+
+- id: mission_deplacement_multisites
+  type: special
+  titre: "Ordre de mission : Déploiement multi-sites"
+  description: "La direction a besoin d'un technicien sur les sites distants pour renouveler le parc réseau et auditer les baies locales. Tu as le champ libre sur la durée de l'intervention."
+  unique: true
+  semaine_declenchement: 12
+  choix:
+    - texte: "Intervention éclair : 1 semaine sur site (retour rapide au bureau)"
+      cout_energie: 3
+      impacts:
+        technique: 5
+        promotion: 5
+      flags_ajoutes: ["deplacement_1_semaine"]
+
+    - texte: "Intervention standard : 2 semaines sur les sites régionaux"
+      cout_energie: 5
+      impacts:
+        technique: 10
+        promotion: 10
+      flags_ajoutes: ["deplacement_2_semaines"]
+
+    - texte: "Tournée approfondie : 3 semaines de road-trip technique"
+      cout_energie: 7
+      impacts:
+        technique: 15
+        promotion: 15
+      flags_ajoutes: ["deplacement_3_semaines"]
+
+    - texte: "Mission longue durée : 4 semaines complètes loin du siège"
+      cout_energie: 8
+      impacts:
+        technique: 20
+        promotion: 20
+        moral: 10
+      flags_ajoutes: ["deplacement_4_semaines"]
+

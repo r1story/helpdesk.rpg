@@ -3,17 +3,9 @@ import random
 import sys
 import time
 
-from src.engine import GameEngine, charger_archetypes
-from src.models import Player
-from src.ui import afficher_evenement, afficher_tableau_de_bord, demander_choix, effacer_ecran
-from src.ui import (
-    afficher_bilan_action,
-    afficher_evenement,
-    afficher_tableau_de_bord,
-    demander_choix,
-    effacer_ecran,
+from src.achievements import (
+    AchievementManager,
 )
-
 from src.engine import (
     GameEngine,
     charger_archetypes,
@@ -21,13 +13,22 @@ from src.engine import (
     sauvegarder_partie,
     supprimer_sauvegarde,
 )
+from src.models import Player
+from src.ui import (
+    afficher_appel_astreinte,
+    afficher_epilogue,
+    afficher_evenement,
+    afficher_intro_narrative,
+    afficher_pop_up_succes,
+    afficher_succes_automatisation,
+    afficher_tableau_de_bord,
+    demander_choix,
+    effacer_ecran,
+)
 
-from src.achievements import AchievementManager
-from src.ui import afficher_pop_up_succes
 
 def selectionner_archetype() -> dict:
     archetypes = charger_archetypes()
-    
     if not archetypes:
         raise ValueError("Aucun archétype trouvé dans data/archetypes.yaml !")
 
@@ -43,7 +44,7 @@ def selectionner_archetype() -> dict:
 
 def main() -> None:
     effacer_ecran()
-    
+
     # 1. Vérification d'une sauvegarde existante
     partie_sauvegardee = charger_partie()
     joueur = None
@@ -77,6 +78,8 @@ def main() -> None:
             energie_max=stats["energie_max"],
             energie=stats["energie_max"],
         )
+        # Introduction narrative personnalisée
+        afficher_intro_narrative(joueur)
 
     moteur = GameEngine(joueur)
 
@@ -86,30 +89,37 @@ def main() -> None:
         if fin:
             effacer_ecran()
             afficher_tableau_de_bord(joueur)
-            print("=== FIN DE PARTIE ===")
-            print(f"Résultat : {fin}\n")
 
-            # Gestion des succès selon la fin
             ach_manager = AchievementManager()
             id_succes = None
+            code_epilogue = "renouvellement"
 
             if "Burn-out" in fin:
                 id_succes = "fin_burnout"
-            elif "Licenciement" in fin:
+                code_epilogue = "burnout"
+            elif "fin à ton contrat" in fin:
                 id_succes = "fin_licenciement"
+                code_epilogue = "licenciement"
             elif "RSSI" in fin:
                 id_succes = "fin_rssi"
+                code_epilogue = "rssi"
             elif "chèvres" in fin:
                 id_succes = "fin_campagne"
-            elif "Maintien au poste" in fin:
+                code_epilogue = "campagne"
+            elif "CDI Confirmé" in fin:
                 id_succes = "fin_survie"
+                code_epilogue = "cdi"
 
+            # Affiche l'histoire de fin
+            afficher_epilogue(code_epilogue, joueur)
+
+            # Déblocage du trophée
             if id_succes and ach_manager.deverrouiller(id_succes):
                 succes = ach_manager.achievements[id_succes]
                 afficher_pop_up_succes(succes["titre"], succes["description"])
 
             supprimer_sauvegarde()
-            input("Appuie sur Entrée pour quitter...")
+            input("Appuie sur Entrée pour clore la partie...")
             break
 
         # Sauvegarde automatique au début de chaque nouvelle semaine
@@ -120,8 +130,7 @@ def main() -> None:
         print(f"--- DÉBUT DE LA SEMAINE {joueur.semaine_actuelle} ---")
         time.sleep(1)
 
-        
-        # Détection d'une crise scriptée pour cette semaine
+        # Détection d'une crise ou événement scripté pour cette semaine
         evenement_scripté = moteur.obtenir_evenement_scripté_semaine()
 
         while joueur.energie > 0:
@@ -129,50 +138,144 @@ def main() -> None:
             if fin:
                 break
 
-            # Si une crise est en attente, elle passe obligatoirement en premier
-            if crise_active:
-                event = crise_active
-                crise_active = None  # Consommée pour la semaine
+            # Si un événement scripté est en attente, il passe en priorité
+            if evenement_scripté:
+                event = evenement_scripté
+                evenement_scripté = None
             else:
                 events_dispo = moteur.obtenir_evenements_disponibles()
                 if not events_dispo:
                     events_dispo = [e for e in moteur.events if e.semaine_declenchement is None]
                 event = random.choice(events_dispo)
 
-
-                while True:
+            while True:
                 effacer_ecran()
                 afficher_tableau_de_bord(joueur)
-                afficher_evenement(event)
 
-                idx_choix = demander_choix(len(event.choix), peut_quitter=True, username=joueur.nom)
+                peut_automatiser = (joueur.technique >= 80 and event.type != "crise")
+                afficher_evenement(event, peut_automatiser=peut_automatiser)
 
-                # Sortie de secours : le joueur quitte le bureau pour la semaine
-                if idx_choix == -1:
-                    print("\nTu fermes ta session et quittes le bureau pour le week-end...")
-                    joueur.energie = 0  # Force la fin de la semaine
-                    time.sleep(1)
-                    break
+                choix_brut = demander_choix(
+                    len(event.choix),
+                    peut_quitter=True,
+                    username=joueur.nom,
+                    autoriser_auto=peut_automatiser,
+                )
 
-                choix_selectionne = event.choix[idx_choix]
+                match choix_brut:
+                    # Cas 1 : Quitter le bureau
+                    case -1:
+                        print("\nTu fermes ta session et quittes le bureau pour le week-end...")
+                        joueur.energie = 0
+                        time.sleep(0.8)
+                        break
 
-                # Vérification de l'énergie
-                if joueur.energie < choix_selectionne.cout_energie:
-                    print(f"\n[!] Énergie insuffisante ! Il te reste {joueur.energie}⚡, cette action en demande {choix_selectionne.cout_energie}⚡.")
-                    print("Appuie sur Entrée pour rechoisir une option réalisable...")
-                    input()
-                    continue
+                    # Cas 2 : Consultation de la galerie des succès
+                    case "9":
+                        effacer_ecran()
+                        AchievementManager().afficher_galerie()
+                        input("Appuie sur Entrée pour revenir au bureau...")
+                        continue
 
-                # Si l'énergie est suffisante, on applique et on avance
+                    # Cas 3 : Automatisation par script (Tech >= 80)
+                    case "A":
+                        if joueur.energie < 1:
+                            print("\n[!] Pas assez d'énergie même pour lancer ton script (1⚡ requis) !")
+                            time.sleep(1.2)
+                            continue
+
+                        joueur.enregistrer_snapshot()
+                        joueur.consommer_energie(1)
+                        joueur.ajuster_jauge("promotion", 5)
+                        joueur.ajuster_jauge("technique", 2)
+                        moteur.enregistrer_passage_evenement(event)
+
+                        afficher_succes_automatisation()
+                        time.sleep(1.2)
+                        break
+
+                    # Cas 4 : Choix d'action classique (index entier)
+                    case int(idx):
+                        choix_selectionne = event.choix[idx]
+
+                        if joueur.energie < choix_selectionne.cout_energie:
+                            print(
+                                f"\n[!] Énergie insuffisante "
+                                f"({joueur.energie}⚡ dispo, {choix_selectionne.cout_energie}⚡ requis)."
+                            )
+                            time.sleep(1.2)
+                            continue
+
+                        # Traitement standard du choix
+                        joueur.enregistrer_snapshot()
+                        moteur.appliquer_choix(choix_selectionne, event)
+
                 moteur.appliquer_choix(choix_selectionne, event)
+
+                # Traitement des événements avec time skip (déplacement, congés, formation)
+                if event.id == "mission_deplacement_multisites":
+                    duree = 1
+                    if "deplacement_2_semaines" in choix_selectionne.flags_ajoutes:
+                        duree = 2
+                    elif "deplacement_3_semaines" in choix_selectionne.flags_ajoutes:
+                        duree = 3
+                    elif "deplacement_4_semaines" in choix_selectionne.flags_ajoutes:
+                        duree = 4
+
+                    joueur.semaine_actuelle += (duree - 1)
+                    effacer_ecran()
+                    print(f"\n🚨 RETOUR DE DÉPLACEMENT APRÈS {duree} SEMAINE(S) !")
+                    malus_moral = 5 * duree
+                    malus_energie = min(joueur.energie, 2 * duree)
+                    joueur.ajuster_jauge("moral", -malus_moral)
+                    joueur.consommer_energie(malus_energie)
+                    time.sleep(1.5)
+
+                if "vacances_ete_prises" in choix_selectionne.flags_ajoutes:
+                    joueur.semaine_actuelle += 1
+                    joueur.bonus_energie_suivante += 3
+                    joueur.bonus_technique_suivant += 3
+                    time.sleep(1)
+
+                if "vacances_hiver_prises" in choix_selectionne.flags_ajoutes:
+                    joueur.bonus_energie_suivante += 3
+                    joueur.bonus_technique_suivant += 3
+                    time.sleep(1)
+
+                if event.id == "mission_formation_pro":
+                    joueur.semaine_actuelle += 1
+                    time.sleep(1)
+
                 moteur.enregistrer_passage_evenement(event)
-                afficher_bilan_action(choix_selectionne)
-                print("Appuie sur Entrée pour continuer...")
-                input()
+                time.sleep(0.8)
                 break
+
+        # Aléa d'astreinte le week-end (20% de probabilité)
+        if random.random() < 0.20 and joueur.semaine_actuelle < 52:
+            effacer_ecran()
+            afficher_appel_astreinte()
+            choix_astreinte = demander_choix(2, username=joueur.nom)
+
+            if choix_astreinte == 0:  # Option 1 : Décrocher
+                print("\nTu passes 2 heures les yeux embrumés à relancer le service.")
+                print("Le lundi matin, le management salue ton dévouement sans faille.")
+                joueur.ajuster_jauge("moral", -10)
+                joueur.ajuster_jauge("promotion", 15)
+                joueur.ajuster_jauge("technique", 5)
+                joueur.bonus_energie_suivante -= 2
+            else:  # Option 2 : Ignorer
+                print("\nTu coupes le téléphone. Après tout, l'astreinte n'était pas déclarée.")
+                print("Lundi 8h30, le patron t'attend avec un café froid et les yeux noirs.")
+                joueur.ajuster_jauge("moral", 15)
+                joueur.ajuster_jauge("promotion", -15)
+                joueur.ajuster_jauge("relationnel", -5)
+
+            time.sleep(2)
+            input("\nAppuie sur Entrée pour clore le week-end...")
 
         # Fin de semaine
         joueur.semaine_actuelle += 1
+
 
 if __name__ == "__main__":
     main()

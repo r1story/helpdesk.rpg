@@ -2,6 +2,7 @@
 from datetime import datetime
 import json
 from pathlib import Path
+from src.ui import BOLD, DIM, JAUNE, RESET, VERT
 
 CHEMIN_ACHIEVEMENTS = Path(__file__).resolve().parent.parent / "data" / "achievements.json"
 
@@ -34,22 +35,29 @@ class AchievementManager:
         return False
 
     def afficher_galerie(self) -> None:
-        """Affiche l'ensemble des trophées débloqués et verrouillés."""
-        print("\n" + "=" * 64)
-        print("                 🏆 SALLE DES SUCCÈS 🏆")
-        print("=" * 64)
-        total = len(self.achievements)
-        debloques = sum(1 for a in self.achievements.values() if a["debloque"])
-        print(f" Progression globale : {debloques}/{total}\n")
+        """Affiche le Hall des Succès sans révéler les conditions des trophées verrouillés."""
+        print(f"\n{BOLD}{'═' * 66}{RESET}")
+        print(f"{BOLD}                  🏆 SALLE DES SUCCÈS 🏆{RESET}")
+        print(f"{BOLD}{'═' * 66}{RESET}\n")
 
-        for a in self.achievements.values():
-            if a["debloque"]:
-                statut = "\033[92m[DÉBLOQUÉ]\033[0m"
-                print(f" {statut} \033[1m{a['titre']}\033[0m (le {a['date']})")
-                print(f"    {a['description']}")
+        total = len(self.achievements)
+        debloques = sum(1 for a in self.achievements.values() if a.get("debloque", False))
+        print(f"Progression globale : {JAUNE}{debloques}/{total}{RESET} succès déverrouillés\n")
+
+        for id_succes, data in self.achievements.items():
+            est_debloque = data.get("debloque", False)
+            icone = data.get("icone", "🏆")
+
+            if est_debloque:
+                tag = f"{VERT}[DÉBLOQUÉ]{RESET}"
+                titre = f"{BOLD}{data['titre']}{RESET}"
+                description = f"{DIM}{data['description']}{RESET}"
             else:
-                statut = "\033[2m[VERROUILLÉ]\033[0m"
-                print(f" {statut} \033[2m{a['titre']}\033[0m")
-                print(f"    \033[2m{a['description']}\033[0m")
-            print("-" * 64)
-        print()
+                tag = f"{DIM}[VERROUILLÉ]{RESET}"
+                titre = f"{DIM}??? {data['titre']}{RESET}"
+                description = f"{DIM}??? Objectif masqué — Jouez pour découvrir ce secret.{RESET}"
+
+            print(f" {icone} {tag} {titre}")
+            print(f"    {description}\n")
+
+        print(f"{BOLD}{'═' * 66}{RESET}\n")

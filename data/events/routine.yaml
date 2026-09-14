@@ -270,3 +270,105 @@
         moral: -5
         technique: -5
         relationnel: 5
+
+- id: ticket_adaptateur_hdmi_vip
+  type: routine
+  titre: "Urgence VIP : Présentation investisseurs sans écran"
+  description: "Le Directeur Général hurle en salle du conseil : la réunion démarre dans 2 minutes et il n'a pas son adaptateur USB-C vers HDMI pour projeter ses slides."
+  cooldown: 4
+  choix:
+    - texte: "Sprint dans les couloirs avec l'adaptateur de ta propre sacoche"
+      cout_energie: 2
+      impacts:
+        moral: -5
+        relationnel: 10
+        promotion: 15
+      flags_ajoutes: ["sauveur_du_board"]
+
+    - texte: "Lui rappeler par messagerie qu'il y avait un câble fixe et qu'il l'a probablement égaré"
+      cout_energie: 0
+      impacts:
+        moral: 5
+        relationnel: -15
+        promotion: -15
+
+- id: ticket_souris_sans_fil_off
+  type: routine
+  titre: "N1 Absurde : 'Mon curseur est complètement figé'"
+  description: "Un responsable logistique t'appelle en panique : ni la souris ni l'écran ne répondent. Arrivé à son bureau, l'interrupteur sous sa souris sans fil est simplement sur 'OFF'."
+  cooldown: 3
+  choix:
+    - texte: "Basculer l'interrupteur sur ON sans le faire remarquer pour lui éviter la honte"
+      cout_energie: 1
+      impacts:
+        moral: -10
+        relationnel: 15
+        promotion: 5
+
+    - texte: "Lui montrer poliment le bouton en soupirant ostensiblement"
+      cout_energie: 1
+      impacts:
+        moral: 5
+        relationnel: -10
+
+- id: ticket_switch_sauvage_boucle
+  type: routine
+  titre: "Réseau : Broadcast storm sur l'étage compta"
+  description: "Un employé a ramené son switch Netgear 5 ports de chez lui pour brancher son PC et son imprimante perso, créant une boucle réseau sauvage qui met le spanning-tree en panique."
+  cooldown: 6
+  choix:
+    - texte: "Identifier le port en CLI, désactiver l'interface et confisquer le boîtier"
+      cout_energie: 3
+      impacts:
+        moral: 5
+        technique: 15
+        relationnel: -10
+        promotion: 10
+      flags_ajoutes: ["chasseur_de_shadow_it"]
+
+    - texte: "Rebooter le switch d'étage et espérer que ça tienne jusqu'au soir"
+      cout_energie: 1
+      impacts:
+        moral: -5
+        technique: -5
+
+- id: ticket_depart_commercial_urgent
+  type: routine
+  titre: "RH Sécurité : Révocation express d'un commercial"
+  description: "Les RH demandent de couper les accès d'un commercial partant chez un concurrent dans les 5 minutes et de cloner sa boîte mail pour audit de fuite de données."
+  cooldown: 5
+  choix:
+    - texte: "Révoquer les sessions Azure/AD, bloquer le compte et archiver la mailbox en script"
+      cout_energie: 3
+      impacts:
+        technique: 15
+        promotion: 15
+        moral: -5
+      flags_ajoutes: ["garde_fou_rh"]
+
+    - texte: "Désactiver juste le mot de passe sur l'AD local et oublier Microsoft 365"
+      cout_energie: 1
+      impacts:
+        technique: -10
+        promotion: -10
+
+- id: ticket_pc_qui_a_bu_du_cafe
+  type: routine
+  titre: "Matériel : 'Il ne s'allume plus tout seul depuis ce matin...'"
+  description: "Un utilisateur jure qu'il n'a rien fait. En ouvrant le châssis, les touches collent et une odeur entêtante d'expresso sucré se dégage de la carte mère."
+  cooldown: 4
+  choix:
+    - texte: "Démonter, nettoyer à l'alcool isopropylique et faire signer un constat de dégât"
+      cout_energie: 3
+      impacts:
+        technique: 10
+        moral: -10
+        promotion: 5
+
+    - texte: "Classer hors garantie sans chercher à réparer et commander un poste neuf"
+      cout_energie: 1
+      impacts:
+        moral: 5
+        relationnel: 10
+        promotion: -5
+

@@ -1,10 +1,10 @@
 # Helpdesk RPG 🖥️⚡
 
-Un RPG textuel satirique et réaliste dans le terminal, inspiré de l'univers du support informatique et des livres dont vous êtes le héros.
+Un RPG textuel satirique et réaliste dans le terminal, inspiré du quotidien sur le terrain du support informatique N1-N2 et des livres dont vous êtes le héros.
 
-Incarnez un technicien informatique fraîchement recruté et tentez de survivre à une année complète (**52 semaines**) au sein d'une entreprise. Entre les pannes de switchs non sauvegardés, les caprices de la direction, les bourrages papier et les audits de sécurité inopinés, chaque choix impacte directement vos jauges : **Moral**, **Compétences Techniques**, **Relationnel**, **Promotion** et votre réserve hebdomadaire d'**Énergie**.
+Incarnez un technicien informatique fraîchement embauché et tentez de survivre aux **26 semaines de votre période d'essai** au sein de l'entreprise. Entre les pannes de switchs non sauvegardés, les exigences lunaires de la direction, les loopbacks sauvages sous les bureaux et les alertes d'astreinte un samedi à 3h du matin, chaque décision impacte directement vos jauges : **Moral**, **Compétences Techniques**, **Relationnel**, **Promotion** et votre réserve hebdomadaire d'**Énergie**.
 
-Saurez-vous gravir les échelons jusqu'au poste de RSSI, ou finirez-vous par tout plaquer pour élever des chèvres dans la Creuse ?
+Parviendrez-vous à décrocher votre CDI (voire une promotion éclair au poste de RSSI), ou votre période d'essai prendra-t-elle fin prématurément pour cause de burn-out face aux tickets d'imprimantes ?
 
 ---
 
