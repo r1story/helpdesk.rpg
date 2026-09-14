@@ -33,9 +33,7 @@ pip install -r requirements.txt
 
 3. **Lancer le jeu :**
 ```bash
-chmod +x run.sh
-./run.sh
-# Ou directement : python3 main.py
+python3 main.py
 
 ```
 
