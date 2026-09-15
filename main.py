@@ -133,12 +133,13 @@ def main() -> None:
         # Détection d'une crise ou événement scripté pour cette semaine
         evenement_scripté = moteur.obtenir_evenement_scripté_semaine()
 
+        # DÉBUT DE LA SEMAINE
         while joueur.energie > 0:
             fin = moteur.verifier_fin_de_partie()
             if fin:
                 break
 
-            # Si un événement scripté est en attente, il passe en priorité
+            # Tirage de l'événement
             if evenement_scripté:
                 event = evenement_scripté
                 evenement_scripté = None
@@ -148,7 +149,8 @@ def main() -> None:
                     events_dispo = [e for e in moteur.events if e.semaine_declenchement is None]
                 event = random.choice(events_dispo)
 
-            while True:
+            ticket_resolu = False
+            while not ticket_resolu:
                 effacer_ecran()
                 afficher_tableau_de_bord(joueur)
 
@@ -163,24 +165,23 @@ def main() -> None:
                 )
 
                 match choix_brut:
-                    # Cas 1 : Quitter le bureau
                     case -1:
+                        # Le joueur décide volontairement de quitter le bureau
                         print("\nTu fermes ta session et quittes le bureau pour le week-end...")
                         joueur.energie = 0
                         time.sleep(0.8)
+                        ticket_resolu = True
                         break
 
-                    # Cas 2 : Consultation de la galerie des succès
                     case "9":
                         effacer_ecran()
                         AchievementManager().afficher_galerie()
                         input("Appuie sur Entrée pour revenir au bureau...")
                         continue
 
-                    # Cas 3 : Automatisation par script (Tech >= 80)
                     case "A":
                         if joueur.energie < 1:
-                            print("\n[!] Pas assez d'énergie même pour lancer ton script (1⚡ requis) !")
+                            print("\n[!] Pas assez d'énergie (1⚡ requis) !")
                             time.sleep(1.2)
                             continue
 
@@ -192,9 +193,9 @@ def main() -> None:
 
                         afficher_succes_automatisation()
                         time.sleep(1.2)
+                        ticket_resolu = True
                         break
 
-                    # Cas 4 : Choix d'action classique (index entier)
                     case int(idx):
                         choix_selectionne = event.choix[idx]
 
@@ -206,49 +207,42 @@ def main() -> None:
                             time.sleep(1.2)
                             continue
 
-                        # Traitement standard du choix
                         joueur.enregistrer_snapshot()
                         moteur.appliquer_choix(choix_selectionne, event)
 
-                moteur.appliquer_choix(choix_selectionne, event)
+                        # Événements spéciaux de skip
+                        if event.id == "mission_deplacement_multisites":
+                            duree = 1
+                            if "deplacement_2_semaines" in choix_selectionne.flags_ajoutes:
+                                duree = 2
+                            elif "deplacement_3_semaines" in choix_selectionne.flags_ajoutes:
+                                duree = 3
+                            elif "deplacement_4_semaines" in choix_selectionne.flags_ajoutes:
+                                duree = 4
+                            joueur.semaine_actuelle += (duree - 1)
+                            # On vide l'énergie pour terminer la semaine de mission
+                            joueur.energie = 0
 
-                # Traitement des événements avec time skip (déplacement, congés, formation)
-                if event.id == "mission_deplacement_multisites":
-                    duree = 1
-                    if "deplacement_2_semaines" in choix_selectionne.flags_ajoutes:
-                        duree = 2
-                    elif "deplacement_3_semaines" in choix_selectionne.flags_ajoutes:
-                        duree = 3
-                    elif "deplacement_4_semaines" in choix_selectionne.flags_ajoutes:
-                        duree = 4
+                        if "vacances_ete_prises" in choix_selectionne.flags_ajoutes:
+                            joueur.semaine_actuelle += 1
+                            joueur.bonus_energie_suivante += 3
+                            joueur.bonus_technique_suivant += 3
+                            joueur.energie = 0
 
-                    joueur.semaine_actuelle += (duree - 1)
-                    effacer_ecran()
-                    print(f"\n🚨 RETOUR DE DÉPLACEMENT APRÈS {duree} SEMAINE(S) !")
-                    malus_moral = 5 * duree
-                    malus_energie = min(joueur.energie, 2 * duree)
-                    joueur.ajuster_jauge("moral", -malus_moral)
-                    joueur.consommer_energie(malus_energie)
-                    time.sleep(1.5)
+                        if "vacances_hiver_prises" in choix_selectionne.flags_ajoutes:
+                            joueur.bonus_energie_suivante += 3
+                            joueur.bonus_technique_suivant += 3
+                            joueur.energie = 0
 
-                if "vacances_ete_prises" in choix_selectionne.flags_ajoutes:
-                    joueur.semaine_actuelle += 1
-                    joueur.bonus_energie_suivante += 3
-                    joueur.bonus_technique_suivant += 3
-                    time.sleep(1)
+                        if event.id == "mission_formation_pro":
+                            joueur.semaine_actuelle += 1
+                            joueur.energie = 0
 
-                if "vacances_hiver_prises" in choix_selectionne.flags_ajoutes:
-                    joueur.bonus_energie_suivante += 3
-                    joueur.bonus_technique_suivant += 3
-                    time.sleep(1)
-
-                if event.id == "mission_formation_pro":
-                    joueur.semaine_actuelle += 1
-                    time.sleep(1)
-
-                moteur.enregistrer_passage_evenement(event)
-                time.sleep(0.8)
-                break
+                        moteur.enregistrer_passage_evenement(event)
+                        time.sleep(1)
+                        
+                        ticket_resolu = True
+                        break  # Sort de la boucle du ticket, mais RESTE dans while joueur.energie > 0 !
 
         # Aléa d'astreinte le week-end (20% de probabilité)
         if random.random() < 0.20 and joueur.semaine_actuelle < 52:

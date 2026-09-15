@@ -213,7 +213,7 @@ def afficher_intro_narrative(joueur: Player) -> None:
     """Introduction immersive façon briefing de bienvenue."""
     effacer_ecran()
     print(f"{CYAN}{BOLD}╔{'═' * 70}╗{RESET}")
-    print(f"{CYAN}{BOLD}║  🏢 LUNDI MATIN — 08H45 : PREMIER JOUR CHEZ TECHCORP SOLUTIONS      ║{RESET}")
+    print(f"{CYAN}{BOLD}║  🏢 LUNDI MATIN — 08H45 : PREMIER JOUR CHEZ TECHCORP SOLUTIONS       ║{RESET}")
     print(f"{CYAN}{BOLD}╚{'═' * 70}╝{RESET}\n")
 
     print(f"Marc, le Responsable Support N2/N3, t'accueille avec un mug ébréché à la main.\n")

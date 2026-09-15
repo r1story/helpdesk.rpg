@@ -63,10 +63,21 @@ class Player:
         self.energie = max(0, self.energie - montant)
 
     def reinitialiser_energie(self) -> None:
-        nouvelle_energie = self.energie_max + self.bonus_energie_suivante
-        self.energie = max(0, nouvelle_energie)
+        """Réinitialise l'énergie hebdomadaire en appliquant passifs et bonus."""
+        energie_de_base = self.energie_max
+
+        # Prise en compte d'un passif permanent d'archétype
+        if self.passif == "endurance_etudiant" or "mentor_apprenti" in self.flags:
+            energie_de_base += 1
+
+        # Application du bonus/malus temporaire (ex: retour de vacances +3, astreinte -2)
+        total_calcule = energie_de_base + self.bonus_energie_suivante
+        self.energie = max(0, total_calcule)
+
+        # Remise à zéro du bonus temporaire consommé
         self.bonus_energie_suivante = 0
 
+        # Application des bonus de stats différés
         if self.bonus_technique_suivant > 0:
             self.ajuster_jauge("technique", self.bonus_technique_suivant)
             self.bonus_technique_suivant = 0

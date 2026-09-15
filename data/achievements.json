@@ -2,14 +2,14 @@
   "fin_burnout": {
     "titre": "Victime du Backlog",
     "description": "Atteindre 0 de moral et sombrer dans le burn-out.",
-    "debloque": false,
-    "date": null
+    "debloque": true,
+    "date": "14/09/2026 12:58"
   },
   "fin_licenciement": {
     "titre": "Retour à Pôle Emploi",
     "description": "Se faire virer pour promotion tombée à zéro.",
-    "debloque": false,
-    "date": null
+    "debloque": true,
+    "date": "14/09/2026 13:07"
   },
   "fin_rssi": {
     "titre": "Le Grand Patron Cyber",
