@@ -27,12 +27,51 @@ class AchievementManager:
     def deverrouiller(self, id_succes: str) -> bool:
         """Débloque un succès s'il existe et n'était pas encore validé.
         Retourne True si le succès vient tout juste d'être acquis."""
-        if id_succes in self.achievements and not self.achievements[id_succes]["debloque"]:
+        if id_succes in self.achievements and not self.achievements[id_succes].get("debloque", False):
             self.achievements[id_succes]["debloque"] = True
             self.achievements[id_succes]["date"] = datetime.now().strftime("%d/%m/%Y %H:%M")
             self._sauvegarder()
+            
+            # Alerte visuelle immédiate dans le terminal
+            titre = self.achievements[id_succes].get("titre", id_succes)
+            icone = self.achievements[id_succes].get("icone", "🏆")
+            print(f"\n{VERT}{BOLD}🎉 SUCCÈS DÉBLOQUÉ : {icone} {titre} !{RESET}\n")
             return True
         return False
+
+    def verifier_progression(self, joueur) -> None:
+        """Vérifie l'ensemble des conditions dynamiques et débloque les succès correspondants."""
+        if not self.achievements.get("mentoring_leo", {}).get("debloque", False):
+            affinite_leo = joueur.relations.get("leo", 0)
+            a_aide_ad = "leo_aide_restauration_ad" in joueur.flags
+            a_soutenu_restic = "leo_soutenu_restic" in joueur.flags
+
+            if affinite_leo > 90 and a_aide_ad and a_soutenu_restic:
+                self.deverrouiller("mentoring_leo")
+
+        if not self.achievements.get("didier_ragequit", {}).get("debloque", False):
+            if joueur.relations.get("didier", 50) <= 15:
+                self.deverrouiller("didier_ragequit")
+
+        if not self.achievements.get("fils_a_papa", {}).get("debloque", False):
+            if joueur.relations.get("kevin", 0) >= 80 and joueur.relations.get("patron", 0) >= 80:
+                self.deverrouiller("fils_a_papa")
+        
+        if not self.achievements.get("elu_du_cse", {}).get("debloque", False):
+            if joueur.relationnel >= 85 and joueur.promotion >= 70 and joueur.technique < 40:
+                self.deverrouiller("elu_du_cse")
+
+        if not self.achievements.get("loopback_master", {}).get("debloque", False):
+            # Soit via compteur :
+            if getattr(joueur, "tickets_reseau_resolus", 0) >= 3:
+                self.deverrouiller("loopback_master")
+
+        if not self.achievements.get("ticket_zero", {}).get("debloque", False):
+            if joueur.semaine_actuelle >= 26:
+                derniers_vendredis = {23, 24, 25, 26}
+                a_quitte_tot = any(s in joueur.semaines_quitte_tot for s in derniers_vendredis)
+                if not a_quitte_tot:
+                    self.deverrouiller("ticket_zero")
 
     def afficher_galerie(self) -> None:
         """Affiche le Hall des Succès sans révéler les conditions des trophées verrouillés."""

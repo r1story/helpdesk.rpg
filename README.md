@@ -1,6 +1,6 @@
 # Helpdesk RPG 🖥️⚡
 
-Un RPG textuel satirique et réaliste dans le terminal, inspiré du quotidien sur le terrain du support informatique N1-N2 et des livres dont vous êtes le héros.
+Un RPG textuel satirique et réaliste dans le terminal, inspiré du quotidien sur le terrain du support informatique N1-N2.
 
 Incarnez un technicien informatique fraîchement embauché et tentez de survivre aux **26 semaines de votre période d'essai** au sein de l'entreprise. Entre les pannes de switchs non sauvegardés, les exigences lunaires de la direction, les loopbacks sauvages sous les bureaux et les alertes d'astreinte un samedi à 3h du matin, chaque décision impacte directement vos jauges : **Moral**, **Compétences Techniques**, **Relationnel**, **Promotion** et votre réserve hebdomadaire d'**Énergie**.
 
@@ -88,8 +88,8 @@ Au début de votre aventure, vous devez choisir votre parcours professionnel. Ch
 
 Le jeu intègre un système persistant de récompenses indépendant des réinitialisations de parties :
 
-* **7 succès uniques** sont à déverrouiller au total.
-* Ils récompensent la découverte des différentes conclusions de carrière (officielles ou officieuses), ainsi que des choix spécifiques liés à certains profils ou crises critiques.
+* **13 succès uniques** sont à déverrouiller au total.
+* Ils récompensent la découverte des différentes conclusions de carrière (officielles ou officieuses), ainsi que des choix spécifiques liés à certains profils, relations ou crises critiques.
 * La progression globale est conservée d'une tentative à l'autre dans le registre local du jeu.
 
 ---

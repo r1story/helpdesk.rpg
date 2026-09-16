@@ -1,0 +1,23 @@
+- id: "leo"
+  nom: "Léo"
+  role: "L'Alternant"
+  affinite_initiale: 60
+  description: "Volontaire & bosseur. Prêt à filer un coup de main si affinité haute."
+
+- id: "patron"
+  nom: "M. Marchand"
+  role: "Le Patron"
+  affinite_initiale: 40
+  description: "Sec et direct. Regarde uniquement les résultats et la stabilité."
+
+- id: "kevin"
+  nom: "Kévin"
+  role: "Support N0 / Fils du Patron"
+  affinite_initiale: 50
+  description: "Nid à problèmes. Attention : le froisser impacte directement le patron !"
+
+- id: "didier"
+  nom: "Didier"
+  role: "L'Ancien / Faux Expert"
+  affinite_initiale: 35
+  description: "Susceptible. S'il se sent ignoré, un switch risque de sauter un matin."

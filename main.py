@@ -12,10 +12,12 @@ from src.engine import (
     charger_partie,
     sauvegarder_partie,
     supprimer_sauvegarde,
+    charger_pnj,
 )
 from src.models import Player
 from src.ui import (
     afficher_appel_astreinte,
+    afficher_annuaire_pnj,
     afficher_epilogue,
     afficher_evenement,
     afficher_intro_narrative,
@@ -52,7 +54,7 @@ def main() -> None:
     if partie_sauvegardee:
         print("=== SESSION ANTÉRIEURE DÉTECTÉE ===")
         print(f"Technicien : {partie_sauvegardee.nom} ({partie_sauvegardee.archetype})")
-        print(f"Progression : Semaine {partie_sauvegardee.semaine_actuelle}/52\n")
+        print(f"Progression : Semaine {partie_sauvegardee.semaine_actuelle}/26\n")
         print("  [1] Reprendre le poste")
         print("  [2] Réinitialiser et écraser la session\n")
         choix_save = demander_choix(2)
@@ -66,7 +68,8 @@ def main() -> None:
         nom = input("Entre le prénom de ton technicien : ").strip() or "Nouveau Tech"
         profil = selectionner_archetype()
         stats = profil["stats"]
-
+        catalogue_pnj = charger_pnj()
+        relations_init = {p["id"]: p.get("affinite_initiale", 50) for p in catalogue_pnj}
         joueur = Player(
             nom=nom,
             archetype=profil["nom"],
@@ -75,10 +78,10 @@ def main() -> None:
             relationnel=stats["relationnel"],
             moral=stats["moral"],
             promotion=stats["promotion"],
+            relations=relations_init,
             energie_max=stats["energie_max"],
             energie=stats["energie_max"],
         )
-        # Introduction narrative personnalisée
         afficher_intro_narrative(joueur)
 
     moteur = GameEngine(joueur)
@@ -166,16 +169,22 @@ def main() -> None:
 
                 match choix_brut:
                     case -1:
-                        # Le joueur décide volontairement de quitter le bureau
                         print("\nTu fermes ta session et quittes le bureau pour le week-end...")
+                        joueur.semaines_quitte_tot.add(joueur.semaine_actuelle)
                         joueur.energie = 0
-                        time.sleep(0.8)
                         ticket_resolu = True
                         break
 
                     case "9":
                         effacer_ecran()
                         AchievementManager().afficher_galerie()
+                        input("Appuie sur Entrée pour revenir au bureau...")
+                        continue
+
+                    case "6":
+                        effacer_ecran()
+                        catalogue_pnj = charger_pnj()
+                        afficher_annuaire_pnj(joueur, catalogue_pnj)
                         input("Appuie sur Entrée pour revenir au bureau...")
                         continue
 
@@ -210,6 +219,7 @@ def main() -> None:
                         joueur.enregistrer_snapshot()
                         moteur.appliquer_choix(choix_selectionne, event)
 
+                        AchievementManager().verifier_progression(joueur)
                         # Événements spéciaux de skip
                         if event.id == "mission_deplacement_multisites":
                             duree = 1
@@ -240,12 +250,12 @@ def main() -> None:
 
                         moteur.enregistrer_passage_evenement(event)
                         time.sleep(1)
-                        
+
                         ticket_resolu = True
                         break  # Sort de la boucle du ticket, mais RESTE dans while joueur.energie > 0 !
 
         # Aléa d'astreinte le week-end (20% de probabilité)
-        if random.random() < 0.20 and joueur.semaine_actuelle < 52:
+        if random.random() < 0.20 and joueur.semaine_actuelle < 26:
             effacer_ecran()
             afficher_appel_astreinte()
             choix_astreinte = demander_choix(2, username=joueur.nom)

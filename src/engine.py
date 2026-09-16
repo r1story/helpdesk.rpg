@@ -67,6 +67,8 @@ class GameEngine:
                     event = GameEvent(
                         id=item["id"],
                         type=item.get("type", "routine"),
+                        tags=item.get("tags", []),
+                        pnj=item.get("pnj"),
                         titre=item["titre"],
                         description=item["description"],
                         choix=liste_choix,
@@ -141,3 +143,11 @@ class GameEngine:
     def enregistrer_passage_evenement(self, event: GameEvent) -> None:
         """Marque la semaine où l'événement a été tiré."""
         event.derniere_semaine_jouee = self.player.semaine_actuelle
+
+def charger_pnj() -> list[dict]:
+    """Charge la configuration des PNJ depuis le fichier data/pnj.yaml."""
+    chemin = Path(__file__).resolve().parent.parent / "data" / "pnj.yaml"
+    if not chemin.exists():
+        return []
+    with open(chemin, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or []

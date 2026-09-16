@@ -19,12 +19,13 @@ class GameEvent:
     titre: str
     description: str
     choix: List[Choice]
+    tags: List[str] = field(default_factory=list)
+    pnj: str | None = None
     cooldown: int = 1
     unique: bool = False
     semaine_declenchement: int | None = None
     archetype_requis: str | None = None
     derniere_semaine_jouee: int = -999
-
 
 @dataclass
 class Player:
@@ -32,22 +33,50 @@ class Player:
     archetype: str
     passif: str | None = None
 
+    # Jauges principales (0 à 100)
     moral: int = 70
     technique: int = 30
     relationnel: int = 50
     promotion: int = 20
 
+    # Dictionnaire id_pnj -> affinité (0 à 100)
+    relations: Dict[str, int] = field(default_factory=dict)
+
+    # Énergie hebdomadaire
     energie_max: int = 10
     energie: int = 10
 
+    # Dans Player (src/models.py) :
+    tickets_reseau_resolus: int = 0
+    semaines_quitte_tot: Set[int] = field(default_factory=set)
+
+    # Progression temporelle & flags
     semaine_actuelle: int = 1
     flags: Set[str] = field(default_factory=set)
 
+    # Bonus temporaires
     bonus_energie_suivante: int = 0
     bonus_technique_suivant: int = 0
 
     # Historique du tour précédent pour le tableau comparatif
     stats_precedentes: Dict[str, int] = field(default_factory=dict)
+
+    def ajuster_relation(self, pnj: str, delta: int) -> None:
+        """Modifie l'affinité avec un PNJ et répercute la mécanique Kévin -> Patron."""
+        if pnj not in self.relations:
+            return
+
+        self.relations[pnj] = max(0, min(100, self.relations[pnj] + delta))
+
+        # Froisser Kévin froisse le patron
+        if pnj == "kevin" and delta < 0:
+            malus_patron = int(delta * 1.5)
+            if "patron" in self.relations:
+                self.relations["patron"] = max(0, min(100, self.relations["patron"] + malus_patron))
+
+        # Recalcul de la moyenne globale
+        if self.relations:
+            self.relationnel = sum(self.relations.values()) // len(self.relations)
 
     def enregistrer_snapshot(self) -> None:
         """Capture les valeurs actuelles avant qu'un choix ne soit appliqué."""
@@ -63,29 +92,26 @@ class Player:
         self.energie = max(0, self.energie - montant)
 
     def reinitialiser_energie(self) -> None:
-        """Réinitialise l'énergie hebdomadaire en appliquant passifs et bonus."""
-        energie_de_base = self.energie_max
-
-        # Prise en compte d'un passif permanent d'archétype
+        energie_base = self.energie_max
         if self.passif == "endurance_etudiant" or "mentor_apprenti" in self.flags:
-            energie_de_base += 1
+            energie_base += 1
 
-        # Application du bonus/malus temporaire (ex: retour de vacances +3, astreinte -2)
-        total_calcule = energie_de_base + self.bonus_energie_suivante
-        self.energie = max(0, total_calcule)
-
-        # Remise à zéro du bonus temporaire consommé
+        total = energie_base + self.bonus_energie_suivante
+        self.energie = max(0, total)
         self.bonus_energie_suivante = 0
 
-        # Application des bonus de stats différés
         if self.bonus_technique_suivant > 0:
             self.ajuster_jauge("technique", self.bonus_technique_suivant)
             self.bonus_technique_suivant = 0
 
     def ajuster_jauge(self, jauge: str, delta: int) -> None:
+        if jauge in self.relations:
+            self.ajuster_relation(jauge, delta)
+            return
+
         if hasattr(self, jauge):
-            valeur_actuelle = getattr(self, jauge)
-            setattr(self, jauge, max(0, min(100, valeur_actuelle + delta)))
+            val = getattr(self, jauge)
+            setattr(self, jauge, max(0, min(100, val + delta)))
 
     def est_en_burnout(self) -> bool:
         return self.moral <= 0
@@ -99,6 +125,7 @@ class Player:
             "technique": self.technique,
             "relationnel": self.relationnel,
             "promotion": self.promotion,
+            "relations": self.relations,
             "energie_max": self.energie_max,
             "energie": self.energie,
             "semaine_actuelle": self.semaine_actuelle,
@@ -118,6 +145,7 @@ class Player:
             technique=data["technique"],
             relationnel=data["relationnel"],
             promotion=data["promotion"],
+            relations=data.get("relations", {}),
             energie_max=data["energie_max"],
             energie=data["energie"],
             semaine_actuelle=data["semaine_actuelle"],
@@ -126,46 +154,3 @@ class Player:
             bonus_technique_suivant=data.get("bonus_technique_suivant", 0),
             stats_precedentes=data.get("stats_precedentes", {}),
         )
-
-    @classmethod
-    def from_dict(cls, data: dict) -> "Player":
-        """Reconstitue une instance Player depuis un dictionnaire JSON."""
-        flags_set = set(data.get("flags", []))
-        return cls(
-            nom=data["nom"],
-            archetype=data["archetype"],
-            passif=data.get("passif"),
-            moral=data["moral"],
-            technique=data["technique"],
-            relationnel=data["relationnel"],
-            promotion=data["promotion"],
-            energie_max=data["energie_max"],
-            energie=data["energie"],
-            semaine_actuelle=data["semaine_actuelle"],
-            flags=flags_set,
-            bonus_energie_suivante=data.get("bonus_energie_suivante", 0),
-            bonus_technique_suivant=data.get("bonus_technique_suivant", 0),
-        )
-
-@dataclass
-class Choice:
-    texte: str
-    cout_energie: int
-    impacts: Dict[str, int]  # ex: {"moral": -5, "technique": 10}
-    flags_requis: List[str] = field(default_factory=list)
-    flags_ajoutes: List[str] = field(default_factory=list)
-
-
-@dataclass
-class GameEvent:
-    id: str
-    type: str  # "routine", "crise", "special"
-    titre: str
-    description: str
-    choix: List[Choice]
-    cooldown: int = 1
-    unique: bool = False
-    semaine_declenchement: int | None = None
-    archetype_requis: str | None = None  # id de l'archétype requis (ex: "autodidacte")
-    derniere_semaine_jouee: int = -999
-

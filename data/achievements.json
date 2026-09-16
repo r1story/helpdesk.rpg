@@ -2,14 +2,14 @@
   "fin_burnout": {
     "titre": "Victime du Backlog",
     "description": "Atteindre 0 de moral et sombrer dans le burn-out.",
-    "debloque": true,
-    "date": "14/09/2026 12:58"
+    "debloque": false,
+    "date": null
   },
   "fin_licenciement": {
     "titre": "Retour à Pôle Emploi",
     "description": "Se faire virer pour promotion tombée à zéro.",
-    "debloque": true,
-    "date": "14/09/2026 13:07"
+    "debloque": false,
+    "date": null
   },
   "fin_rssi": {
     "titre": "Le Grand Patron Cyber",
@@ -38,6 +38,43 @@
   "planque_sieste_master": {
     "titre": "Fonctionnaire du Privé",
     "description": "En tant que Planqué, esquiver 10 tickets sans aucune conséquence.",
+    "debloque": false,
+    "date": null
+  },
+  "mentoring_leo": {
+    "titre": "Mentor d'Élite",
+    "icone": "🎓",
+    "description": "Léo signe son CDI, te remercie de l'avoir autant soutenu pendant ses derniers mois d'alternance et te dédicace son diplôme à la réunion d'équipe.",
+    "debloque": false,
+    "date": null
+  },
+  "didier_ragequit": {
+    "titre": "Victime du Shadow-IT",
+    "description": "Didier a arraché un câble de brassage en jurant que c'était mieux sous Windows XP.",
+    "debloque": false,
+    "date": null
+  },
+  "fils_a_papa": {
+    "titre": "Diplomate de Couloir",
+    "description": "Avoir survécu aux caprices de Kévin sans compromettre son intégrité ni celle du SI.",
+    "debloque": false,
+    "date": null
+  },
+  "elu_du_cse": {
+    "titre": "Élu du CSE",
+    "description": "Tu ne sais toujours pas redémarrer un service sans tout faire tomber, mais tout le monde vote pour toi.",
+    "debloque": false,
+    "date": null
+  },
+  "loopback_master": {
+    "titre": "Tempête de Broadcast",
+    "description": "Avoir neutralisé 3 incidents réseau critiques sans faiblir.",
+    "debloque": false,
+    "date": null
+  },
+  "ticket_zero": {
+    "titre": "Boîte de Réception Vide",
+    "description": "Terminer le contrat sans avoir fui le bureau un seul vendredi après-midi sur le dernier mois.",
     "debloque": false,
     "date": null
   }

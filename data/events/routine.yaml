@@ -1,5 +1,6 @@
 - id: ticket_bourrage_papier
   type: routine
+  tags: ["material"]
   titre: "Incident N1 : L'imprimante du service compta"
   description: "Bernadette de la compta appelle en panique : l'imprimante réseau refuse de sortir les bulletins de paie. Un voyant rouge clignote."
   choix:
@@ -28,6 +29,7 @@
 
 - id: ticket_mot_de_passe_dg
   type: routine
+  tags: ["security", "director"]
   titre: "Ticket VIP : Perte d'accès du Directeur Général"
   description: "Le DG est bloqué devant son écran après avoir tapé cinq fois son mot de passe avec le verrouillage majuscule activé. Il exige un reset sans passer par la procédure standard."
   choix:
@@ -47,27 +49,9 @@
         promotion: 15
       flags_ajoutes: ["compromission_securite"]
 
-- id: chantier_sauvegarde_auto
-  type: routine
-  titre: "Amélioration : Script de sauvegarde préventive"
-  description: "Le serveur de partage de fichiers n'a pas de sauvegarde automatisée. Personne ne te l'a demandé, mais un crash serait dramatique."
-  choix:
-    - texte: "Prendre sur son temps pour écrire et tester un script de snapshot"
-      cout_energie: 4
-      impacts:
-        moral: 10
-        technique: 20
-        promotion: 5
-      flags_ajoutes: ["sauvegardes_en_place"]
-
-    - texte: "Laisser tourner tel quel, ce n'est pas ta fiche de poste"
-      cout_energie: 0
-      impacts:
-        moral: 0
-        technique: -5
-
 - id: onboarding_nouvel_arrivant
   type: routine
+  tags: ["material", "system", "server", "director"]
   titre: "RH : Onboarding de dernière minute"
   description: "Les RH t'informent qu'un nouveau cadre arrive dans 15 minutes. Aucun compte AD n'est créé et aucun PC n'est préparé."
   cooldown: 3
@@ -90,6 +74,7 @@
 
 - id: mot_de_passe_lundi
   type: routine
+  tags: ["system", "security"]
   titre: "Routine : L'amnésie du lundi matin"
   description: "Trois utilisateurs d'un coup ont oublié leur mot de passe après le week-end et bloquent leur session Windows."
   cooldown: 1
@@ -109,6 +94,7 @@
 
 - id: nettoyage_backlog_tickets
   type: routine
+  tags: ["system"]
   titre: "Gestion : Nettoyage du cimetière de tickets"
   description: "Le backlog affiche 120 tickets ouverts depuis plus de 6 mois sans réponse des utilisateurs."
   cooldown: 6
@@ -130,6 +116,7 @@
 
 - id: phishing_suspicion
   type: routine
+  tags: ["director", "security"]
   titre: "Sécurité : Signalement de mail douteux"
   description: "Un comptable a cliqué sur un lien 'Facture urgente Chronopost' et a entré ses identifiants Microsoft 365."
   cooldown: 4
@@ -151,6 +138,7 @@
 
 - id: demande_shadow_it
   type: routine
+  tags: ["security", "director"]
   titre: "Shadow IT : Le service Marketing veut ses droits Admin"
   description: "Le responsable com' veut installer un logiciel de montage vidéo non homologué et exige les droits administrateur local."
   cooldown: 4
@@ -172,6 +160,7 @@
 
 - id: cable_management_baie
   type: routine
+  tags: ["material", "server"]
   titre: "Propreté : La baie de brassage ressemble à un plat de spaghettis"
   description: "Des jarretières de 5 mètres pendent n'importe comment dans le local technique. Un faux mouvement peut faire sauter un switch."
   cooldown: 8
@@ -192,6 +181,7 @@
 
 - id: utilisateur_vip_caprice
   type: routine
+  tags: ["material", "director"]
   titre: "VIP : Le Directeur Financier veut un double écran 4K"
   description: "Le DAF exige du matériel ultra haut de gamme non standard sans passer par la validation des devis."
   cooldown: 5
@@ -212,6 +202,7 @@
 
 - id: wifi_visiteur_en_panne
   type: routine
+  tags: ["security", "network", "material"]
   titre: "Réseau : Le Wi-Fi de la salle de réunion est aux fraises"
   description: "Des clients importants sont en réunion, la borne Wi-Fi refuse toute association DHCP."
   cooldown: 3
@@ -221,6 +212,7 @@
       impacts:
         technique: 5
         relationnel: 10
+      flags_ajoutes: ["resolution_reseau"]
 
     - texte: "Diagnostiquer le bail DHCP saturé et reconfigurer le pool sur le contrôleur"
       cout_energie: 3
@@ -229,9 +221,12 @@
         technique: 15
         relationnel: 10
         promotion: 5
+      flags_ajoutes: ["resolution_reseau"]
 
 - id: pause_cafe_syndicat
   type: routine
+  tags: ["director"]
+  pnj: kevin
   titre: "Social : Discussion informelle à la machine à café"
   description: "Les collègues râlent sur le nouveau logiciel RH. Ils te demandent ton avis sur la direction."
   cooldown: 2
@@ -239,6 +234,7 @@
     - texte: "Rejoindre la contestation et critiquer les décisions du management"
       cout_energie: 1
       impacts:
+        kevin: -20
         moral: 15
         relationnel: 20
         promotion: -15
@@ -253,6 +249,7 @@
 
 - id: poste_infeste_adware
   type: routine
+  tags: ["security", "system", "material"]
   titre: "Poste de travail : 'Mon PC est lent et m'ouvre des pubs de casino'"
   description: "Un poste de l'accueil est vérolé par des barres d'outils douteuses après le téléchargement d'un faux convertisseur PDF."
   cooldown: 3
@@ -273,6 +270,7 @@
 
 - id: ticket_adaptateur_hdmi_vip
   type: routine
+  tags: ["material", "director"]
   titre: "Urgence VIP : Présentation investisseurs sans écran"
   description: "Le Directeur Général hurle en salle du conseil : la réunion démarre dans 2 minutes et il n'a pas son adaptateur USB-C vers HDMI pour projeter ses slides."
   cooldown: 4
@@ -294,6 +292,8 @@
 
 - id: ticket_souris_sans_fil_off
   type: routine
+  tags: ["material"]
+  pnj: didier
   titre: "N1 Absurde : 'Mon curseur est complètement figé'"
   description: "Un responsable logistique t'appelle en panique : ni la souris ni l'écran ne répondent. Arrivé à son bureau, l'interrupteur sous sa souris sans fil est simplement sur 'OFF'."
   cooldown: 3
@@ -308,32 +308,14 @@
     - texte: "Lui montrer poliment le bouton en soupirant ostensiblement"
       cout_energie: 1
       impacts:
+        didier: -20
         moral: 5
         relationnel: -10
 
-- id: ticket_switch_sauvage_boucle
-  type: routine
-  titre: "Réseau : Broadcast storm sur l'étage compta"
-  description: "Un employé a ramené son switch Netgear 5 ports de chez lui pour brancher son PC et son imprimante perso, créant une boucle réseau sauvage qui met le spanning-tree en panique."
-  cooldown: 6
-  choix:
-    - texte: "Identifier le port en CLI, désactiver l'interface et confisquer le boîtier"
-      cout_energie: 3
-      impacts:
-        moral: 5
-        technique: 15
-        relationnel: -10
-        promotion: 10
-      flags_ajoutes: ["chasseur_de_shadow_it"]
-
-    - texte: "Rebooter le switch d'étage et espérer que ça tienne jusqu'au soir"
-      cout_energie: 1
-      impacts:
-        moral: -5
-        technique: -5
 
 - id: ticket_depart_commercial_urgent
   type: routine
+  tags: ["material", "director", "security"]
   titre: "RH Sécurité : Révocation express d'un commercial"
   description: "Les RH demandent de couper les accès d'un commercial partant chez un concurrent dans les 5 minutes et de cloner sa boîte mail pour audit de fuite de données."
   cooldown: 5
@@ -354,6 +336,8 @@
 
 - id: ticket_pc_qui_a_bu_du_cafe
   type: routine
+  tags: ["material"]
+  pnj: kevin
   titre: "Matériel : 'Il ne s'allume plus tout seul depuis ce matin...'"
   description: "Un utilisateur jure qu'il n'a rien fait. En ouvrant le châssis, les touches collent et une odeur entêtante d'expresso sucré se dégage de la carte mère."
   cooldown: 4
@@ -364,6 +348,7 @@
         technique: 10
         moral: -10
         promotion: 5
+        kevin: 10
 
     - texte: "Classer hors garantie sans chercher à réparer et commander un poste neuf"
       cout_energie: 1
@@ -372,3 +357,179 @@
         relationnel: 10
         promotion: -5
 
+- id: ticket_didier_loopback
+  type: routine
+  pnj: didier
+  tags: ["network", "material"]
+  titre: "Boucle réseau sous un bureau"
+  description: "Didier a branché un petit switch 5 ports sous sa table pour ses VM de test, créant une tempête de broadcast sur l'étage."
+  cooldown: 4
+  choix:
+    - texte: "Lui confisquer son switch calmement et lui expliquer le STP"
+      cout_energie: 2
+      impacts:
+        didier: -20
+        technique: 5
+      flags_ajoutes: ["resolution_reseau"]
+    - texte: "Isoler son port à distance sans rien dire et le laisser chercher"
+      cout_energie: 1
+      impacts:
+        didier: -10
+        moral: 5
+      flags_ajoutes: ["resolution_reseau"]
+
+- id: ticket_kevin_double_ecran
+  type: routine
+  pnj: kevin
+  tags: ["material", "director"]
+  titre: "Écrans 4K incurvés pour Kévin"
+  description: "Kévin exige le remplacement de ses deux écrans 24 pouces par un 49 pouces incurvé ultra-wide pour 'mieux voir ses mails'."
+  cooldown: 4
+  choix:
+    - texte: "Installer l'écran immédiatement en faisant passer ça sur le budget IT"
+      cout_energie: 2
+      impacts:
+        kevin: 25
+        patron: 10
+        promotion: 5
+        moral: -10
+    - texte: "Lui rappeler fermement la politique de dotation matérielle de l'entreprise"
+      cout_energie: 1
+      impacts:
+        kevin: -25
+        moral: 10
+
+
+- id: ticket_leo_script_python
+  type: routine
+  pnj: leo
+  tags: ["system", "server"]
+  titre: "Revue de code avec Léo"
+  description: "Léo a écrit un script d'automatisation des sauvegardes et te demande une demi-heure pour le relire ensemble."
+  cooldown: 4
+  choix:
+    - texte: "Prendre le temps de lui faire un retour détaillé sur ses fonctions"
+      cout_energie: 2
+      impacts:
+        leo: 20
+        technique: 5
+        moral: 5
+    - texte: "Lui dire que tu n'as pas le temps et de tester directement en prod"
+      cout_energie: 0
+      impacts:
+        leo: -15
+        promotion: -5
+
+- id: ticket_kevin_droit_admin_steam
+  type: routine
+  pnj: kevin
+  tags: ["security", "director", "system"]
+  titre: "Demande de droits Admin pour 'besoins logiciels'"
+  description: "Kévin débarque à ton bureau en affirmant qu'il a besoin d'être administrateur local de sa machine pour tester des logiciels métiers... En réalité, l'installeur Steam est visible dans sa barre des tâches."
+  cooldown: 6
+  choix:
+    - texte: "Refuser net et lui rappeler la charte de sécurité informatique de l'entreprise"
+      cout_energie: 1
+      impacts:
+        kevin: -20
+        moral: 5
+        technique: 5
+    - texte: "Lui créer un compte à privilèges temporaire pour éviter qu'il n'aille pleurer"
+      cout_energie: 1
+      impacts:
+        kevin: 20
+        patron: 5
+        promotion: -5
+        moral: -10
+
+- id: ticket_didier_vlan_sauvage
+  type: routine
+  pnj: didier
+  tags: ["network", "material"]
+  titre: "Reconfiguration hasardeuse d'un switch d'étage"
+  description: "Didier a pris l'initiative d'accéder au switch de brassage de l'aile B pour 'optimiser la table de routage'. Depuis, plus aucune imprimante réseau ne répond et le VLAN 20 est dans les choux."
+  cooldown: 6
+  choix:
+    - texte: "Restaurer le backup de configuration en lui expliquant posément son erreur"
+      cout_energie: 2
+      impacts:
+        didier: -15
+        technique: 10
+        promotion: 5
+      flags_ajoutes: ["resolution_reseau"]
+    - texte: "Réparer discrètement en lui disant qu'il s'agissait simplement d'un bug firmware"
+      cout_energie: 2
+      impacts:
+        didier: 15
+        technique: 5
+        moral: -5
+      flags_ajoutes: ["resolution_reseau"]
+
+- id: ticket_leo_erreur_script_ad
+  type: routine
+  pnj: leo
+  tags: ["server", "system"]
+  titre: "Bourde d'alternant sur l'Active Directory"
+  description: "Léo arrive tout pâle avec sa tasse de café : en voulant nettoyer les comptes inactifs via un script PowerShell, il a accidentellement désactivé l'OU entière du service Marketing."
+  cooldown: 6
+  choix:
+    - texte: "L'aider calmement à écrire la commande de restauration sans lui mettre la pression"
+      cout_energie: 2
+      impacts:
+        leo: 25
+        technique: 5
+        moral: 5
+        flags_ajoutes: ["leo_aide_restauration_ad"]
+    - texte: "Le laisser réparer tout seul pour qu'il apprenne de ses erreurs sous stress"
+      cout_energie: 0
+      impacts:
+        leo: -15
+        moral: -5
+        promotion: -5
+
+- id: ticket_patron_vpn_aeroport
+  type: routine
+  pnj: patron
+  tags: ["director", "security", "network"]
+  titre: "Urgence DSI : Le PC du Patron en escale à Francfort"
+  description: "M. Marchand t'appelle directement sur ton fixe depuis le salon d'un aéroport : son tunnel VPN refuse de monter sur le Wi-Fi public alors qu'il a une réunion stratégique dans 15 minutes."
+  cooldown: 8
+  choix:
+    - texte: "Prendre la main à distance et basculer son profil sur le port 443 en OpenVPN"
+      cout_energie: 3
+      impacts:
+        patron: 25
+        promotion: 15
+        technique: 5
+        moral: -5
+      flags_ajoutes: ["resolution_reseau"]
+    - texte: "Lui expliquer qu'il doit rebooter son PC et désactiver son partage de connexion 4G"
+      cout_energie: 1
+      impacts:
+        patron: -15
+        promotion: -10
+        moral: 0
+      flags_ajoutes: ["resolution_reseau"]
+
+- id: ticket_conflit_sauvegarde_nas
+  type: routine
+  pnj: didier
+  tags: ["server", "system"]
+  titre: "Guerre de clocher : Le vieux script batch vs Restic"
+  description: "Didier veut forcer Léo à maintenir un script .bat sous Windows Server 2008 pour les backups, alors que Léo a configuré une solution moderne chiffrée avec alertes webhook. Ils en viennent presque aux mains."
+  cooldown: 8
+  choix:
+    - texte: "Soutenir publiquement la solution moderne de Léo devant l'équipe"
+      cout_energie: 1
+      impacts:
+        leo: 30
+        didier: -25
+        technique: 10
+        promotion: 5
+        flags_ajoutes: ["leo_soutenu_restic"]
+    - texte: "Faire un compromis mou pour préserver la susceptibilité de Didier"
+      cout_energie: 1
+      impacts:
+        didier: 10
+        leo: -20
+        moral: -10

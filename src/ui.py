@@ -1,8 +1,11 @@
 """src/ui.py : Interface terminal calibrée à 72 colonnes."""
 import os
 import re
+import textwrap
 
 from src.models import Choice, GameEvent, Player
+from src.engine import charger_pnj
+
 
 RESET = "\033[0m"
 BOLD = "\033[1m"
@@ -136,9 +139,28 @@ def afficher_tableau_de_bord(joueur: Player) -> None:
     print(f"{DIM}└{'─' * largeur_interieure}┘{RESET}\n")
 
 
-def afficher_evenement(event: GameEvent, peut_automatiser: bool = False) -> None:
+def afficher_evenement(
+    event: GameEvent,
+    peut_automatiser: bool = False,
+    catalogue_pnj: list[dict] | None = None,
+) -> None:
+    """Affiche le ticket ou la crise en masquant les tags techniques."""
     type_tag = f"{ROUGE}[CRISE]{RESET}" if event.type == "crise" else f"{CYAN}[TICKET]{RESET}"
+
+    # Récupération automatique du catalogue si non fourni
+    if catalogue_pnj is None:
+        catalogue_pnj = charger_pnj()
+
+    # Identification du demandeur
+    demandeur = "Utilisateur anonyme"
+    if event.pnj and catalogue_pnj:
+        pnj_match = next((p for p in catalogue_pnj if p.get("id") == event.pnj), None)
+        if pnj_match:
+            demandeur = f"{pnj_match['nom']} ({pnj_match['role']})"
+
+    # Affichage de l'en-tête sans les tags
     print(f"▶ {type_tag} {BOLD}#{event.id.upper()}{RESET} — {event.titre}")
+    print(f"  {DIM}Demandeur : {demandeur}{RESET}")
     print(f"{DIM}{'─' * 72}{RESET}")
     print(f"  {event.description}\n")
 
@@ -150,9 +172,61 @@ def afficher_evenement(event: GameEvent, peut_automatiser: bool = False) -> None
     if peut_automatiser and event.type != "crise":
         print(f"  {VERT}{BOLD}[A] Déployer un script Bash/PowerShell automatisé (-1⚡, expert Tech){RESET}")
 
+    print(f"  {DIM}[6] Annuaire des collègues & Relations PNJ{RESET}")
     print(f"  {DIM}[9] Consulter la Salle des Succès{RESET}")
     print(f"  {DIM}[0] Quitter le bureau pour cette semaine{RESET}\n")
 
+def barre_relation(valeur: int, longueur: int = 8) -> str:
+    rempli = int((max(0, min(100, valeur)) / 100) * longueur)
+    vide = longueur - rempli
+    if valeur >= 70:
+        c = VERT
+    elif valeur >= 40:
+        c = JAUNE
+    else:
+        c = ROUGE
+    return f"{c}[{'█' * rempli}{'░' * vide}]{RESET} {valeur:3d}/100"
+
+
+def afficher_annuaire_pnj(joueur: Player, catalogue_pnj: list[dict]) -> None:
+    """Affiche la liste détaillée des PNJ basée sur le YAML avec retour à la ligne automatique."""
+    w = 72
+    largeur_interieure = w - 2  # 70 caractères utiles
+
+    print(f"\n{CYAN}{BOLD}┌{'─' * largeur_interieure}┐{RESET}")
+    
+    # Titre avec un préfixe textuel propre pour éviter le décalage de largeur des émojis
+    titre = "  👥 ANNUAIRE : RELATIONS ET COLLÈGUES DU BUREAU"
+    pad_titre = max(0, largeur_interieure - longueur_visible(titre) - 1)    
+    print(f"{CYAN}{BOLD}│{RESET}{BOLD}{titre}{' ' * pad_titre}{CYAN}{BOLD}│{RESET}")
+    print(f"{CYAN}{BOLD}├{'─' * largeur_interieure}┤{RESET}")
+
+    for pnj in catalogue_pnj:
+        p_id = pnj["id"]
+        nom_complet = f"{pnj['nom']} ({pnj['role']})"
+        affinite = joueur.relations.get(p_id, pnj.get("affinite_initiale", 50))
+        desc = pnj.get("description", "")
+        barre = barre_relation(affinite)
+
+        # Ligne 1 : Nom + Jauge d'affinité
+        ligne_nom = f"  {BOLD}{nom_complet}{RESET}"
+        bloc_affinite = f"Affinité : {barre}"
+        espaces_milieu = max(2, largeur_interieure - longueur_visible(ligne_nom) - longueur_visible(bloc_affinite) - 2)
+        ligne_haut = f"{ligne_nom}{' ' * espaces_milieu}{bloc_affinite}  "
+        pad_haut = max(0, largeur_interieure - longueur_visible(ligne_haut))
+        print(f"{CYAN}{BOLD}│{RESET}{ligne_haut}{' ' * pad_haut}{CYAN}{BOLD}│{RESET}")
+
+        # Ligne(s) de description enveloppée(s)
+        lignes_desc = textwrap.wrap(desc, width=largeur_interieure - 6)
+        for sub_ligne in lignes_desc:
+            texte_desc = f"    {DIM}{sub_ligne}{RESET}"
+            pad_desc = max(0, largeur_interieure - longueur_visible(texte_desc))
+            print(f"{CYAN}{BOLD}│{RESET}{texte_desc}{' ' * pad_desc}{CYAN}{BOLD}│{RESET}")
+
+        # Ligne vide séparatrice entre collègues
+        print(f"{CYAN}{BOLD}│{RESET}{' ' * largeur_interieure}{CYAN}{BOLD}│{RESET}")
+
+    print(f"{CYAN}{BOLD}└{'─' * largeur_interieure}┘{RESET}\n")
 
 def demander_choix(
     nb_options: int,
@@ -160,30 +234,34 @@ def demander_choix(
     username: str = "sysadmin",
     autoriser_auto: bool = False,
 ) -> int | str:
-    """Retourne l'index du choix (0 à n-1), -1 pour quitter, 'A' pour auto, ou '9' pour la galerie."""
+    """Retourne l'index du choix (0 à n-1), -1 pour quitter, 'A' pour auto, '6' pour l'annuaire, ou '9' pour les succès."""
     borne_min = 0 if peut_quitter else 1
     user_clean = username.lower().replace(" ", "-")
 
     extra_auto = "/A" if autoriser_auto else ""
-    prompt = f"{BOLD}{VERT}{user_clean}@support:~$ {RESET}Action ({borne_min}-{nb_options}{extra_auto} | 9:Succès) > "
+    prompt = f"{BOLD}{VERT}{user_clean}@support:~$ {RESET}Action ({borne_min}-{nb_options}{extra_auto} | 6:Annuaire | 9:Succès) > "
 
     while True:
         saisie = input(prompt).strip()
+
+        # 1. Commandes spéciales prioritaires
         if autoriser_auto and saisie.upper() == "A":
             return "A"
-        if saisie == "9":
-            return "9"
+        if saisie in ("6", "9"):
+            return saisie
+
+        # 2. Choix numériques de tickets ou sortie
         if saisie.isdigit():
             valeur = int(saisie)
             if valeur == 0 and peut_quitter:
                 return -1
             if 1 <= valeur <= nb_options:
                 return valeur - 1
-        msg = f"0 à {nb_options}" if peut_quitter else f"1 à {nb_options}"
-        if autoriser_auto:
-            msg += " ou A"
-        print(f"{ROUGE}Entrée invalide. Choisis {msg} (ou 9 pour voir les succès).{RESET}")
 
+        msg = f"{borne_min} à {nb_options}"
+        if autoriser_auto:
+            msg += ", A"
+        print(f"{ROUGE}Entrée invalide. Choisis {msg} (ou 6:Annuaire, 9:Succès).{RESET}")
 
 def afficher_appel_astreinte() -> None:
     print(f"\n{ROUGE}{BOLD}┌{'─' * 60}┐{RESET}")
@@ -213,7 +291,7 @@ def afficher_intro_narrative(joueur: Player) -> None:
     """Introduction immersive façon briefing de bienvenue."""
     effacer_ecran()
     print(f"{CYAN}{BOLD}╔{'═' * 70}╗{RESET}")
-    print(f"{CYAN}{BOLD}║  🏢 LUNDI MATIN — 08H45 : PREMIER JOUR CHEZ TECHCORP SOLUTIONS       ║{RESET}")
+    print(f"{CYAN}{BOLD}║  🏢 LUNDI MATIN — 08H45 : PREMIER JOUR CHEZ TECHCORP SOLUTIONS      ║{RESET}")
     print(f"{CYAN}{BOLD}╚{'═' * 70}╝{RESET}\n")
 
     print(f"Marc, le Responsable Support N2/N3, t'accueille avec un mug ébréché à la main.\n")
