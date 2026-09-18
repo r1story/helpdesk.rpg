@@ -90,17 +90,17 @@ class GameEngine:
         return None
 
     def appliquer_choix(self, choix: Choice, event: GameEvent) -> None:
-        """Déduit l'énergie, applique les impacts et prend en compte les passifs."""
-        self.player.consommer_energie(choix.cout_energie)
+            """Applique le coût en énergie, les impacts sur les jauges/PNJ et les flags."""
+            # Débit de l'énergie
+            self.player.consommer_energie(choix.cout_energie)
 
-        for jauge, delta in choix.impacts.items():
-            if self.player.passif == "boost_crises" and jauge == "moral":
-                if event.type == "crise" or event.cooldown >= 4:
-                    delta += 10
-            self.player.ajuster_jauge(jauge, delta)
+            # Application de TOUS les impacts définis dans le YAML
+            for stat, delta in choix.impacts.items():
+                self.player.ajuster_jauge(stat, delta)
 
-        for flag in choix.flags_ajoutes:
-            self.player.flags.add(flag)
+            # Ajout des flags débloqués
+            for fl in choix.flags_ajoutes:
+                self.player.flags.add(fl)
 
     def verifier_fin_de_partie(self) -> str | None:
             """Vérifie l'arrêt de jeu, avec protection passive."""

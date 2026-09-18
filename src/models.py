@@ -62,21 +62,40 @@ class Player:
     stats_precedentes: Dict[str, int] = field(default_factory=dict)
 
     def ajuster_relation(self, pnj: str, delta: int) -> None:
-        """Modifie l'affinité avec un PNJ et répercute la mécanique Kévin -> Patron."""
+        """Modifie l'affinité avec un PNJ/groupe et répercute la mécanique Kévin -> Patron."""
         if pnj not in self.relations:
-            return
+            # Sécurité au cas où le PNJ n'était pas initialisé dans le dict
+            self.relations[pnj] = 50
 
+        # Application du delta borné entre 0 et 100
         self.relations[pnj] = max(0, min(100, self.relations[pnj] + delta))
 
-        # Froisser Kévin froisse le patron
+        # Règle spéciale : froisser Kévin pénalise directement le Patron
         if pnj == "kevin" and delta < 0:
             malus_patron = int(delta * 1.5)
             if "patron" in self.relations:
                 self.relations["patron"] = max(0, min(100, self.relations["patron"] + malus_patron))
 
-        # Recalcul de la moyenne globale
+        # Recalcul systématique de la moyenne globale
         if self.relations:
             self.relationnel = sum(self.relations.values()) // len(self.relations)
+
+    def ajuster_jauge(self, jauge: str, delta: int) -> None:
+        """Point d'entrée unique appelé par engine.py pour appliquer les impacts."""
+        # 1. Si la clé correspond à un PNJ ou au groupe équipe
+        if jauge in self.relations:
+            self.ajuster_relation(jauge, delta)
+            return
+
+        # 2. Redirection des anciens tickets 'relationnel' vers l'équipe
+        if jauge == "relationnel":
+            self.ajuster_relation("equipe", delta)
+            return
+
+        # 3. Jauges standard (moral, technique, promotion)
+        if hasattr(self, jauge):
+            val = getattr(self, jauge)
+            setattr(self, jauge, max(0, min(100, val + delta)))
 
     def enregistrer_snapshot(self) -> None:
         """Capture les valeurs actuelles avant qu'un choix ne soit appliqué."""
@@ -103,15 +122,6 @@ class Player:
         if self.bonus_technique_suivant > 0:
             self.ajuster_jauge("technique", self.bonus_technique_suivant)
             self.bonus_technique_suivant = 0
-
-    def ajuster_jauge(self, jauge: str, delta: int) -> None:
-        if jauge in self.relations:
-            self.ajuster_relation(jauge, delta)
-            return
-
-        if hasattr(self, jauge):
-            val = getattr(self, jauge)
-            setattr(self, jauge, max(0, min(100, val + delta)))
 
     def est_en_burnout(self) -> bool:
         return self.moral <= 0

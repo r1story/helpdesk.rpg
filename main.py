@@ -75,13 +75,12 @@ def main() -> None:
             archetype=profil["nom"],
             passif=profil.get("passif"),
             technique=stats["technique"],
-            relationnel=stats["relationnel"],
             moral=stats["moral"],
             promotion=stats["promotion"],
             relations=relations_init,
             energie_max=stats["energie_max"],
-            energie=stats["energie_max"],
         )
+        joueur.relationnel = sum(joueur.relations.values()) // len(joueur.relations)
         afficher_intro_narrative(joueur)
 
     moteur = GameEngine(joueur)

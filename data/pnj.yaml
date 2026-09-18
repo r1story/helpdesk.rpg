@@ -21,3 +21,9 @@
   role: "L'Ancien / Faux Expert"
   affinite_initiale: 35
   description: "Susceptible. S'il se sent ignoré, un switch risque de sauter un matin."
+
+- id: "equipe"
+  nom: "L'équipe"
+  role: "Ambiance générale"
+  affinite_initiale: 50
+  description: "Le ressenti global des collègues des autres services (compta, RH, marketing)."

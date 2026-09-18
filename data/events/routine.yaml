@@ -8,7 +8,7 @@
       cout_energie: 2
       impacts:
         moral: -10
-        relationnel: 15
+        equipe: 15
         promotion: 5
       flags_ajoutes: ["ami_compta"]
 
@@ -16,14 +16,14 @@
       cout_energie: 1
       impacts:
         moral: -5
-        relationnel: -5
+        equipe: -5
         technique: 0
 
     - texte: "Classer le ticket sans suite avec la mention 'Erreur utilisateur non reproductible'"
       cout_energie: 0
       impacts:
         moral: 5
-        relationnel: -15
+        equipe: -15
         promotion: -10
       flags_ajoutes: ["flemmard"]
 
@@ -45,7 +45,7 @@
       cout_energie: 1
       impacts:
         moral: -5
-        relationnel: 10
+        patron: 10
         promotion: 15
       flags_ajoutes: ["compromission_securite"]
 
@@ -61,14 +61,14 @@
       impacts:
         moral: -5
         technique: 5
-        relationnel: 10
+        equipe: 10
         promotion: 10
 
     - texte: "Rappeler calmement aux RH le SLA de 72h et refuser l'urgence"
       cout_energie: 1
       impacts:
         moral: 10
-        relationnel: -20
+        equipe: -20
         promotion: -10
       flags_ajoutes: ["ennemi_rh"]
 
@@ -83,14 +83,14 @@
       cout_energie: 1
       impacts:
         moral: -5
-        relationnel: 5
+        equipe: 5
 
     - texte: "Prendre 10 minutes pour leur réexpliquer le portail de self-reset"
       cout_energie: 2
       impacts:
         moral: 0
         technique: 5
-        relationnel: 10
+        equipe: 10
 
 - id: nettoyage_backlog_tickets
   type: routine
@@ -103,7 +103,7 @@
       cout_energie: 2
       impacts:
         moral: 15
-        relationnel: -10
+        equipe: -10
         promotion: 10
       flags_ajoutes: ["tueur_de_tickets"]
 
@@ -111,7 +111,7 @@
       cout_energie: 5
       impacts:
         moral: -20
-        relationnel: 15
+        equipe: 15
         promotion: 5
 
 - id: phishing_suspicion
@@ -147,7 +147,7 @@
       cout_energie: 1
       impacts:
         moral: 5
-        relationnel: -15
+        equipe: -15
         promotion: 5
 
     - texte: "Chercher et déployer une alternative open-source propre via le gestionnaire de paquets"
@@ -155,7 +155,7 @@
       impacts:
         moral: 5
         technique: 15
-        relationnel: 15
+        equipe: 15
         promotion: 10
 
 - id: cable_management_baie
@@ -170,7 +170,7 @@
       impacts:
         moral: 10
         technique: 10
-        relationnel: 5
+        equipe: 5
         promotion: 5
       flags_ajoutes: ["baie_propre"]
 
@@ -190,14 +190,14 @@
       cout_energie: 1
       impacts:
         moral: -10
-        relationnel: 15
+        equipe: 15
         promotion: 5
 
     - texte: "Escalader au DSI pour arbitrage budgétaire"
       cout_energie: 2
       impacts:
         moral: 0
-        relationnel: -10
+        equipe: -10
         promotion: 10
 
 - id: wifi_visiteur_en_panne
@@ -211,7 +211,7 @@
       cout_energie: 1
       impacts:
         technique: 5
-        relationnel: 10
+        equipe: 10
       flags_ajoutes: ["resolution_reseau"]
 
     - texte: "Diagnostiquer le bail DHCP saturé et reconfigurer le pool sur le contrôleur"
@@ -219,7 +219,7 @@
       impacts:
         moral: 5
         technique: 15
-        relationnel: 10
+        equipe: 10
         promotion: 5
       flags_ajoutes: ["resolution_reseau"]
 
@@ -236,7 +236,7 @@
       impacts:
         kevin: -20
         moral: 15
-        relationnel: 20
+        equipe: 20
         promotion: -15
       flags_ajoutes: ["rebelle_cafe"]
 
@@ -244,7 +244,8 @@
       cout_energie: 1
       impacts:
         moral: -5
-        relationnel: -10
+        equipe: -10
+        patron: 10
         promotion: 15
 
 - id: poste_infeste_adware
@@ -259,14 +260,14 @@
       impacts:
         moral: 5
         technique: 10
-        relationnel: 5
+        equipe: 5
 
     - texte: "Passer un coup d'antivirus rapide et croiser les doigts"
       cout_energie: 1
       impacts:
         moral: -5
         technique: -5
-        relationnel: 5
+        equipe: 5
 
 - id: ticket_adaptateur_hdmi_vip
   type: routine
@@ -279,7 +280,7 @@
       cout_energie: 2
       impacts:
         moral: -5
-        relationnel: 10
+        equipe: 10
         promotion: 15
       flags_ajoutes: ["sauveur_du_board"]
 
@@ -287,7 +288,7 @@
       cout_energie: 0
       impacts:
         moral: 5
-        relationnel: -15
+        equipe: -15
         promotion: -15
 
 - id: ticket_souris_sans_fil_off
@@ -302,7 +303,7 @@
       cout_energie: 1
       impacts:
         moral: -10
-        relationnel: 15
+        didier: 15
         promotion: 5
 
     - texte: "Lui montrer poliment le bouton en soupirant ostensiblement"
@@ -310,7 +311,7 @@
       impacts:
         didier: -20
         moral: 5
-        relationnel: -10
+        didier: -10
 
 
 - id: ticket_depart_commercial_urgent
@@ -354,7 +355,7 @@
       cout_energie: 1
       impacts:
         moral: 5
-        relationnel: 10
+        kevin: 10
         promotion: -5
 
 - id: ticket_didier_loopback
